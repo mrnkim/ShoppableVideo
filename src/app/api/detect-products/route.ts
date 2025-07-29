@@ -6,7 +6,7 @@ export const maxDuration = 120;
 
 // TwelveLabs API configuration
 const TWELVELABS_API_KEY = process.env.TWELVELABS_API_KEY;
-const TWELVELABS_API_URL = process.env.TWELVELABS_API_URL || "https://api.twelvelabs.io/v1.2";
+const TWELVELABS_API_URL = process.env.TWELVELABS_API_URL || "https://api.twelvelabs.io/v1.3";
 
 // Product categories we want to detect
 const PRODUCT_CATEGORIES = [
