@@ -188,13 +188,13 @@ export default function Home() {
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="lg:w-2/3">
         <h1 className="text-2xl font-bold mb-4">Shoppable Video Experience</h1>
-        
+
         <div className="flex items-center mb-6 text-sm">
           <div className={`px-3 py-1 rounded-full mr-3 flex items-center ${useMockData ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
             <span className="w-2 h-2 rounded-full mr-2 bg-current"></span>
             {useMockData ? 'Demo Mode' : 'API Connected'}
           </div>
-          
+
           {isLoadingProducts && (
             <div className="flex items-center text-blue-600">
               <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
@@ -202,12 +202,11 @@ export default function Home() {
             </div>
           )}
         </div>
-        
+
         <p className="text-gray-600 mb-6">
           Discover and purchase products directly from this video without interrupting playback.
-          Click on the product markers to learn more and add items to your cart.
         </p>
-        
+
         {/* Video Player with Product Overlays */}
         <ProductVideoPlayer
           videoUrl={videoUrl}
@@ -215,20 +214,20 @@ export default function Home() {
           onProductSelect={handleProductSelect}
           autoPlay={true}
         />
-        
+
         {/* Video Description */}
-        <div className="mt-6 p-4 bg-white rounded-lg shadow">
+        {/* <div className="mt-6 p-4 bg-white rounded-lg shadow">
           <h2 className="text-xl font-semibold">About This Video</h2>
           <p className="text-gray-600 mt-2">
-            This demo showcases how AI-powered video understanding can transform the viewing experience 
-            into a shopping opportunity. Products are detected in real-time using TwelveLabs' deep 
-            semantic search capabilities, allowing viewers to discover and purchase items without 
+            This demo showcases how AI-powered video understanding can transform the viewing experience
+            into a shopping opportunity. Products are detected in real-time using TwelveLabs' deep
+            semantic search capabilities, allowing viewers to discover and purchase items without
             interrupting their viewing experience.
           </p>
-        </div>
-        
+        </div> */}
+
         {/* Technology Explanation */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+        {/* <div className="mt-6 p-4 bg-blue-50 rounded-lg">
           <h2 className="text-lg font-semibold text-blue-800">Powered by TwelveLabs AI</h2>
           <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white p-3 rounded shadow-sm">
@@ -250,9 +249,9 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
-      
+
       <div className="lg:w-1/3">
         {/* Product Detail Sidebar */}
         <ProductDetailSidebar
@@ -263,18 +262,18 @@ export default function Home() {
           onRelatedProductSelect={handleRelatedProductSelect}
           isLoading={isLoadingRelated}
         />
-        
+
         {/* Shopping Cart */}
-        <ShoppingCart
+        {/* <ShoppingCart
           items={items}
           onUpdateQuantity={updateQuantity}
           onCheckout={handleCheckout}
           isOpen={isCartOpen}
           onToggle={toggleCart}
-        />
-        
+        /> */}
+
         {/* Additional Info */}
-        {!selectedProduct && (
+        {/* {!selectedProduct && (
           <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
             <h3 className="font-medium text-gray-700 mb-2">How It Works</h3>
             <ol className="list-decimal list-inside text-sm text-gray-600 space-y-2">
@@ -285,7 +284,7 @@ export default function Home() {
               <li>Complete your purchase without leaving the video</li>
             </ol>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

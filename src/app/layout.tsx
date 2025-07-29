@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import Providers from './providers';
 
 // Load Inter font with Latin subset for better performance
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
@@ -35,13 +35,6 @@ export default function RootLayout({
                 </div>
                 <h1 className="text-xl font-semibold text-secondary">ShoppableVideo</h1>
               </div>
-              <nav>
-                <ul className="flex space-x-6">
-                  <li className="text-sm text-gray-600 hover:text-accent transition-colors">Discover</li>
-                  <li className="text-sm text-gray-600 hover:text-accent transition-colors">How It Works</li>
-                  <li className="text-sm text-gray-600 hover:text-accent transition-colors">About</li>
-                </ul>
-              </nav>
             </div>
           </header>
           <main className="container mx-auto px-4 py-8">
@@ -51,7 +44,6 @@ export default function RootLayout({
             <div className="container mx-auto px-4 py-6">
               <div className="text-center text-sm text-gray-500">
                 <p>© {new Date().getFullYear()} ShoppableVideo Demo - Powered by TwelveLabs AI</p>
-                <p className="mt-1">A demonstration of AI-powered in-video shopping experiences</p>
               </div>
             </div>
           </footer>

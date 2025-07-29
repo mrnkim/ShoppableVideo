@@ -27,7 +27,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
         </div>
         <h2 className="text-xl font-semibold mb-2">Discover Products</h2>
         <p className="text-gray-600">
-          Click on product markers in the video to view details and add items to your cart.
+          Click on product markers in the video to view details.
         </p>
       </div>
     );
@@ -41,9 +41,9 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
             <div className="h-7 bg-gray-200 rounded w-3/4"></div>
             <div className="w-6 h-6 bg-gray-200 rounded-full"></div>
           </div>
-          
+
           <div className="bg-gray-200 h-48 rounded mb-4"></div>
-          
+
           <div className="mb-4 space-y-2">
             <div className="flex justify-between mb-2">
               <div className="h-4 bg-gray-200 rounded w-1/4"></div>
@@ -54,16 +54,16 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
               <div className="h-4 bg-gray-200 rounded w-1/4"></div>
             </div>
           </div>
-          
+
           <div className="h-20 bg-gray-200 rounded mb-4"></div>
-          
+
           <div className="bg-blue-50 p-3 rounded-lg mb-4">
             <div className="h-4 bg-blue-100 rounded w-3/4 mb-2"></div>
             <div className="h-12 bg-blue-100 rounded"></div>
           </div>
-          
+
           <div className="h-10 bg-gray-200 rounded mb-6"></div>
-          
+
           <div className="mt-6">
             <div className="h-6 bg-gray-200 rounded w-1/3 mb-3"></div>
             <div className="grid grid-cols-2 gap-3">
@@ -81,7 +81,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
     <div className="bg-white rounded-lg shadow-lg p-4 mb-6 overflow-y-auto max-h-[calc(100vh-200px)] product-sidebar">
       <div className="flex justify-between items-start mb-4">
         <h2 className="text-xl font-semibold">{product.name}</h2>
-        <button 
+        <button
           className="text-gray-400 hover:text-gray-600 transition-colors"
           onClick={onClose}
           aria-label="Close product details"
@@ -89,12 +89,12 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
           <Close />
         </button>
       </div>
-      
+
       <div className="bg-gray-100 h-48 rounded mb-4 flex items-center justify-center">
         {/* Product image would go here - using placeholder for demo */}
         <Info className="text-gray-400" fontSize="large" />
       </div>
-      
+
       <div className="mb-4">
         <div className="flex justify-between mb-2">
           <span className="text-gray-600">Price:</span>
@@ -109,9 +109,9 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
           <span>{Math.round(product.confidence * 100)}%</span>
         </div>
       </div>
-      
+
       <p className="text-gray-700 mb-4">{product.description}</p>
-      
+
       {/* AI-Generated Context */}
       {product.aiGeneratedContext && (
         <div className="bg-blue-50 p-3 rounded-lg mb-4">
@@ -119,23 +119,23 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
           <p className="text-sm text-blue-700">{product.aiGeneratedContext}</p>
         </div>
       )}
-      
-      <button 
+
+      <button
         className="w-full bg-primary hover:bg-opacity-90 text-secondary font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
         onClick={() => onAddToCart(product)}
       >
         <ShoppingBag fontSize="small" />
         Add to Cart
       </button>
-      
+
       {/* Related Products */}
       {relatedProducts.length > 0 && (
         <div className="mt-6">
           <h3 className="text-lg font-medium mb-3">Similar Styles</h3>
           <div className="grid grid-cols-2 gap-3">
             {relatedProducts.map(related => (
-              <div 
-                key={related.id} 
+              <div
+                key={related.id}
                 className="product-card bg-white border border-gray-200 rounded p-2 cursor-pointer hover:border-primary transition-colors"
                 onClick={() => onRelatedProductSelect(related)}
               >
