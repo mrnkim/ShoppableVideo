@@ -36,8 +36,8 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     // Filter products that should be visible at current time
     const productsToShow = products.filter(
       product => 
-        currentTime >= product.timeAppearance[0] && 
-        currentTime <= product.timeAppearance[1]
+        currentTime >= product.timeline[0] && 
+        currentTime <= product.timeline[1]
     );
     
     setVisibleProducts(productsToShow);
@@ -86,10 +86,14 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     // Get the actual dimensions of the player container
     const containerRect = playerContainerRef.current.getBoundingClientRect();
     
-    // Calculate position based on percentage
+    // Calculate position based on the location array [x, y, width, height]
+    // Convert absolute coordinates (based on 1920x1080) to percentage
+    const x = (product.location[0] / 1920) * 100;
+    const y = (product.location[1] / 1080) * 100;
+    
     return {
-      left: `${product.position.x}%`,
-      top: `${product.position.y}%`,
+      left: `${x}%`,
+      top: `${y}%`,
     };
   };
 
@@ -138,7 +142,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
       <div className="absolute inset-0 pointer-events-none">
         {visibleProducts.map(product => (
           <button
-            key={product.id}
+            key={product.product_name}
             className="product-marker absolute w-10 h-10 rounded-full bg-primary bg-opacity-70 flex items-center justify-center cursor-pointer pointer-events-auto animate-pulse-slow transition-transform duration-300 ease-in-out"
             style={{ 
               ...calculateMarkerPosition(product),
@@ -149,7 +153,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
               onProductSelect(product);
               setPlaying(false);
             }}
-            aria-label={`View ${product.name} details`}
+            aria-label={`View ${product.product_name} details`}
           >
             <LocalMall className="text-white" />
           </button>

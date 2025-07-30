@@ -15,38 +15,46 @@ const DEMO_VIDEO_URL = "https://storage.googleapis.com/gtv-videos-bucket/sample/
 // Mock products for demonstration when API is not available
 const MOCK_PRODUCTS: ProductDetection[] = [
   {
-    id: "p1",
-    name: "Vintage Leather Jacket",
-    description: "Premium quality leather jacket with distressed finish",
-    price: 199.99,
-    category: "Apparel",
-    position: { x: 45, y: 30 },
-    timeAppearance: [3, 15],
-    confidence: 0.92,
-    aiGeneratedContext: "This rugged leather jacket is perfect for casual outings. The actor is wearing it in an outdoor setting, suggesting it's suitable for fall weather."
-  },
-  {
-    id: "p2",
-    name: "Smart Watch Pro",
-    description: "Next-gen smartwatch with health monitoring features",
-    price: 299.99,
-    category: "Electronics",
-    position: { x: 70, y: 40 },
-    timeAppearance: [8, 20],
-    confidence: 0.87,
-    aiGeneratedContext: "The smartwatch shown in this active scene provides fitness tracking and notification features. The character checks it frequently, highlighting its practical everyday use."
-  },
-  {
-    id: "p3",
-    name: "Designer Sunglasses",
-    description: "UV protected polarized designer sunglasses",
-    price: 149.99,
-    category: "Accessories",
-    position: { x: 30, y: 20 },
-    timeAppearance: [12, 25],
-    confidence: 0.89,
-    aiGeneratedContext: "These stylish sunglasses appear in the bright outdoor scene, providing both UV protection and a fashionable look that complements the character's outfit."
+    "timeline": [8.0, 9.0],
+    "brand": "Google",
+    "product_name": "Chromecast",
+    "location": [1000, 600, 100, 100],
+    "price": "$35",
+    "description": "The Chromecast is shown being plugged into an HDMI port, and the text 'Everything you love now on your TV.' appears on the screen, implying that it allows streaming of content directly to a TV."
   }
+  // {
+  //   id: "p1",
+  //   name: "Vintage Leather Jacket",
+  //   description: "Premium quality leather jacket with distressed finish",
+  //   price: 199.99,
+  //   category: "Apparel",
+  //   position: { x: 45, y: 30 },
+  //   timeAppearance: [3, 15],
+  //   confidence: 0.92,
+  //   aiGeneratedContext: "This rugged leather jacket is perfect for casual outings. The actor is wearing it in an outdoor setting, suggesting it's suitable for fall weather."
+  // },
+  // {
+  //   id: "p2",
+  //   name: "Smart Watch Pro",
+  //   description: "Next-gen smartwatch with health monitoring features",
+  //   price: 299.99,
+  //   category: "Electronics",
+  //   position: { x: 70, y: 40 },
+  //   timeAppearance: [8, 20],
+  //   confidence: 0.87,
+  //   aiGeneratedContext: "The smartwatch shown in this active scene provides fitness tracking and notification features. The character checks it frequently, highlighting its practical everyday use."
+  // },
+  // {
+  //   id: "p3",
+  //   name: "Designer Sunglasses",
+  //   description: "UV protected polarized designer sunglasses",
+  //   price: 149.99,
+  //   category: "Accessories",
+  //   position: { x: 30, y: 20 },
+  //   timeAppearance: [12, 25],
+  //   confidence: 0.89,
+  //   aiGeneratedContext: "These stylish sunglasses appear in the bright outdoor scene, providing both UV protection and a fashionable look that complements the character's outfit."
+  // }
 ];
 
 // Mock related products
@@ -134,10 +142,10 @@ export default function Home() {
       // Use the TwelveLabs client to find related products
       const related = await findRelatedProducts({
         indexId: currentIndex._id,
-        productId: product.id,
-        category: product.category,
-        productName: product.name,
-        timeRange: product.timeAppearance,
+        productId: product.product_name,
+        category: "Electronics",
+        productName: product.product_name,
+        timeRange: product.timeline,
         limit: 4
       });
       setRelatedProducts(related);
