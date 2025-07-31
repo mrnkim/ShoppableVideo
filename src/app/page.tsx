@@ -10,18 +10,58 @@ import { useCart } from '@/contexts/CartContext';
 import { Info, ShoppingBag } from '@mui/icons-material';
 
 // Demo video URL for when no video is selected
-const DEMO_VIDEO_URL = "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4";
+const DEMO_VIDEO_URL = "/breakfast_burrito.mp4";
 
 // Mock products for demonstration when API is not available
 const MOCK_PRODUCTS: ProductDetection[] = [
   {
-    "timeline": [8.0, 9.0],
-    "brand": "Google",
-    "product_name": "Chromecast",
-    "location": [1000, 600, 100, 100],
-    "price": "$35",
-    "description": "The Chromecast is shown being plugged into an HDMI port, and the text 'Everything you love now on your TV.' appears on the screen, implying that it allows streaming of content directly to a TV."
-  }
+    "timeline": [13.0, 16.0],
+    "brand": "Jennie-O",
+    "product_name": "93% lean-7% fat fresh-ground turkey",
+    "location": [960, 540, 100, 50],
+    "price": "Not specified",
+    "description": "The ground turkey is displayed on a countertop and its packaging label is shown, highlighting its nutritional information."
+    },
+    {
+    "timeline": [13.0, 16.0],
+    "brand": "Unknown",
+    "product_name": "Whipped Low Fat Cottage Cheese Spreadable",
+    "location": [1000, 560, 80, 40],
+    "price": "Not specified",
+    "description": "The cottage cheese is displayed on a countertop and later its nutrition facts label is focused on in a close-up shot."
+    },
+    {
+    "timeline": [13.0, 16.0],
+    "brand": "Unknown",
+    "product_name": "White eggs",
+    "location": [1040, 580, 60, 40],
+    "price": "Not specified",
+    "description": "The eggs are shown nestled within a cardboard carton and later used in the recipe."
+    },
+    {
+    "timeline": [13.0, 16.0],
+    "brand": "Unknown",
+    "product_name": "Kale leaves",
+    "location": [1100, 600, 70, 50],
+    "price": "Not specified",
+    "description": "The kale leaves are displayed on a countertop and later added to the skillet with the ground turkey mixture."
+    },
+    {
+    "timeline": [216.0, 224.0],
+    "brand": "Unknown",
+    "product_name": "Flat piece of dough",
+    "location": [960, 540, 100, 50],
+    "price": "Not specified",
+    "description": "The dough is shown resting on parchment paper next to a rolling pin, indicating it is part of the burrito-making process."
+    }
+  // {
+  //   "timeline": [8.0, 9.0],
+  //   "brand": "Google",
+  //   "product_name": "Chromecast",
+  //   "location": [1000, 600, 100, 100],
+  //   "price": "$35",
+  //   "description": "The Chromecast is shown being plugged into an HDMI port, and the text 'Everything you love now on your TV.' appears on the screen, implying that it allows streaming of content directly to a TV."
+  // }
   // {
   //   id: "p1",
   //   name: "Vintage Leather Jacket",
@@ -97,11 +137,11 @@ export default function Home() {
   // State variables
   const [videoUrl, setVideoUrl] = useState<string>(DEMO_VIDEO_URL);
   const [products, setProducts] = useState<ProductDetection[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<ProductDetection | null>(null);
-  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
+  const [visibleProducts, setVisibleProducts] = useState<ProductDetection[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [isLoadingRelated, setIsLoadingRelated] = useState<boolean>(false);
   const [useMockData, setUseMockData] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState(0);
 
   // Detect products in the video
   const handleDetectProducts = useCallback(async () => {
@@ -163,6 +203,14 @@ export default function Home() {
     handleFindRelatedProducts(product);
   }, [handleFindRelatedProducts]);
 
+  const handleVisibleProductsChange = useCallback((products: ProductDetection[]) => {
+    setVisibleProducts(products);
+  }, []);
+
+  const handleTimeUpdate = useCallback((time: number) => {
+    setCurrentTime(time);
+  }, []);
+
   // Handle related product selection
   const handleRelatedProductSelect = (product: RelatedProduct) => {
     addItem(product);
@@ -217,9 +265,10 @@ export default function Home() {
 
         {/* Video Player with Product Overlays */}
         <ProductVideoPlayer
-          videoUrl={videoUrl}
-          products={products}
-          onProductSelect={handleProductSelect}
+          videoUrl={DEMO_VIDEO_URL}
+          products={MOCK_PRODUCTS}
+          onVisibleProductsChange={handleVisibleProductsChange}
+          onTimeUpdate={handleTimeUpdate}
           autoPlay={true}
         />
 
@@ -263,12 +312,12 @@ export default function Home() {
       <div className="lg:w-1/3">
         {/* Product Detail Sidebar */}
         <ProductDetailSidebar
-          product={selectedProduct}
-          relatedProducts={relatedProducts}
-          onClose={() => setSelectedProduct(null)}
-          onAddToCart={addItem}
-          onRelatedProductSelect={handleRelatedProductSelect}
-          isLoading={isLoadingRelated}
+          products={visibleProducts}
+          relatedProducts={MOCK_RELATED_PRODUCTS}
+          onClose={() => {}}
+          onAddToCart={() => {}}
+          onRelatedProductSelect={() => {}}
+          isLoading={false}
         />
 
         {/* Shopping Cart */}

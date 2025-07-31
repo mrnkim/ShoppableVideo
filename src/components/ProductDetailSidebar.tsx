@@ -1,25 +1,39 @@
 import React from 'react';
 import { Close, Info, ShoppingBag, LocalMall } from '@mui/icons-material';
-import { ProductDetection, RelatedProduct } from '@/lib/twelvelabs';
+interface Product {
+  timeline: [number, number];
+  brand: string;
+  product_name: string;
+  location: number[];
+  price: string;
+  description: string;
+}
+
+interface RelatedProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+}
 
 interface ProductDetailSidebarProps {
-  product: ProductDetection | null;
+  products: Product[];
   relatedProducts: RelatedProduct[];
   onClose: () => void;
-  onAddToCart: (product: ProductDetection) => void;
+  onAddToCart: (product: Product) => void;
   onRelatedProductSelect: (product: RelatedProduct) => void;
   isLoading?: boolean;
 }
 
 const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
-  product,
+  products,
   relatedProducts,
   onClose,
   onAddToCart,
   onRelatedProductSelect,
   isLoading = false,
 }) => {
-  if (!product && !isLoading) {
+  if (!products.length && !isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6 text-center h-full">
         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -79,86 +93,48 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 mb-6 overflow-y-auto max-h-[calc(100vh-200px)] product-sidebar">
-      <div className="flex justify-between items-start mb-4">
-        <h2 className="text-xl font-semibold">{product.name}</h2>
-        <button
-          className="text-gray-400 hover:text-gray-600 transition-colors"
-          onClick={onClose}
-          aria-label="Close product details"
-        >
-          <Close />
-        </button>
-      </div>
-
-      <div className="bg-gray-100 h-48 rounded mb-4 flex items-center justify-center">
-        {/* Product image would go here - using placeholder for demo */}
-        <Info className="text-gray-400" fontSize="large" />
-      </div>
-
-      <div className="mb-4">
-        <div className="flex justify-between mb-2">
-          <span className="text-gray-600">Price:</span>
-          <span className="font-semibold">${product.price?.toFixed(2) || '99.99'}</span>
-        </div>
-        <div className="flex justify-between mb-2">
-          <span className="text-gray-600">Category:</span>
-          <span>{product.category}</span>
-        </div>
-        <div className="flex justify-between mb-2">
-          <span className="text-gray-600">Confidence:</span>
-          <span>{Math.round(product.confidence * 100)}%</span>
-        </div>
-      </div>
-
-      <p className="text-gray-700 mb-4">{product.description}</p>
-
-      {/* AI-Generated Context */}
-      {product.aiGeneratedContext && (
-        <div className="bg-blue-50 p-3 rounded-lg mb-4">
-          <h3 className="text-sm font-medium text-blue-800 mb-1">AI Context Analysis</h3>
-          <p className="text-sm text-blue-700">{product.aiGeneratedContext}</p>
-        </div>
-      )}
-
-      <button
-        className="w-full bg-primary hover:bg-opacity-90 text-secondary font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
-        onClick={() => onAddToCart(product)}
-      >
-        <ShoppingBag fontSize="small" />
-        Add to Cart
-      </button>
-
-      {/* Related Products */}
-      {relatedProducts.length > 0 && (
-        <div className="mt-6">
-          <h3 className="text-lg font-medium mb-3">Similar Styles</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {relatedProducts.map(related => (
-              <div
-                key={related.id}
-                className="product-card bg-white border border-gray-200 rounded p-2 cursor-pointer hover:border-primary transition-colors"
-                onClick={() => onRelatedProductSelect(related)}
-              >
-                <div className="bg-gray-100 h-20 rounded mb-2 flex items-center justify-center">
-                  <Info className="text-gray-400" fontSize="small" />
-                </div>
-                <h4 className="text-sm font-medium truncate">{related.name}</h4>
-                <div className="flex justify-between items-center mt-1">
-                  <span className="text-xs text-gray-600">${related.price.toFixed(2)}</span>
-                  {related.whyRecommended && (
-                    <div className="group relative">
-                      <Info fontSize="small" className="text-blue-400 cursor-help" />
-                      <div className="absolute bottom-full right-0 mb-2 w-48 bg-white shadow-lg rounded p-2 text-xs hidden group-hover:block z-10">
-                        {related.whyRecommended}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
+      {products.map((product) => (
+        <div key={product.product_name} className="mb-6">
+          {/* 기존 상세 정보 UI를 여기에 */}
+          <div className="flex justify-between items-start mb-4">
+            <h2 className="text-xl font-semibold">{product.product_name}</h2>
+            <button
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+              onClick={onClose}
+              aria-label="Close product details"
+            >
+              <Close />
+            </button>
           </div>
+          <div className="mb-4">
+            <div className="flex justify-between mb-2">
+              <span className="text-gray-600">Price:</span>
+              <span className="font-semibold">{product.price}</span>
+            </div>
+            <div className="flex justify-between mb-2">
+              <span className="text-gray-600">Brand:</span>
+              <span>{product.brand}</span>
+            </div>
+          </div>
+          <p className="text-gray-700 mb-4">{product.description}</p>
+          <div className="bg-blue-50 p-3 rounded-lg mb-4">
+            <h3 className="text-sm font-medium text-blue-800 mb-1">Appears in Video</h3>
+            <p className="text-sm text-blue-700">
+              {Math.floor(product.timeline[0])}s - {Math.floor(product.timeline[1])}s
+            </p>
+          </div>
+          <button
+            className="w-full bg-primary hover:bg-opacity-90 text-secondary font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
+            onClick={() => {
+              const q = encodeURIComponent(`${product.brand} ${product.product_name}`);
+              window.open(`https://www.amazon.com/s?k=${q}`, '_blank');
+            }}
+          >
+            <ShoppingBag fontSize="small" />
+            Shop at Amazon
+          </button>
         </div>
-      )}
+      ))}
     </div>
   );
 };

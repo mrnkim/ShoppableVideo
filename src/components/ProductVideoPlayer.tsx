@@ -10,6 +10,8 @@ interface ProductVideoPlayerProps {
   width?: string | number;
   height?: string | number;
   autoPlay?: boolean;
+  onVisibleProductsChange?: (products: ProductDetection[]) => void;
+  onTimeUpdate?: (currentTime: number) => void;
 }
 
 const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
@@ -19,6 +21,8 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   width = '100%',
   height = '100%',
   autoPlay = true,
+  onVisibleProductsChange,
+  onTimeUpdate,
 }) => {
   const [playing, setPlaying] = useState<boolean>(autoPlay);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -32,14 +36,17 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   // Update current time and visible products
   const handleProgress = (state: { playedSeconds: number }) => {
     setCurrentTime(state.playedSeconds);
-    
+    if (onTimeUpdate) {
+      onTimeUpdate(state.playedSeconds);
+    }
+
     // Filter products that should be visible at current time
     const productsToShow = products.filter(
-      product => 
-        currentTime >= product.timeline[0] && 
+      product =>
+        currentTime >= product.timeline[0] &&
         currentTime <= product.timeline[1]
     );
-    
+
     setVisibleProducts(productsToShow);
   };
 
@@ -82,15 +89,15 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   // This handles cases where the video player dimensions don't match the original video
   const calculateMarkerPosition = (product: ProductDetection) => {
     if (!playerContainerRef.current) return { left: '0%', top: '0%' };
-    
+
     // Get the actual dimensions of the player container
     const containerRect = playerContainerRef.current.getBoundingClientRect();
-    
+
     // Calculate position based on the location array [x, y, width, height]
     // Convert absolute coordinates (based on 1920x1080) to percentage
     const x = (product.location[0] / 1920) * 100;
     const y = (product.location[1] / 1080) * 100;
-    
+
     return {
       left: `${x}%`,
       top: `${y}%`,
@@ -100,17 +107,23 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   // Seek to a specific time when clicking on the progress bar
   const handleProgressBarClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!playerRef.current || !playerContainerRef.current) return;
-    
+
     const progressBar = e.currentTarget;
     const rect = progressBar.getBoundingClientRect();
     const clickPosition = (e.clientX - rect.left) / rect.width;
     const seekTime = duration * clickPosition;
-    
+
     playerRef.current.seekTo(seekTime);
   };
 
+  useEffect(() => {
+    if (onVisibleProductsChange) {
+      onVisibleProductsChange(visibleProducts);
+    }
+  }, [visibleProducts, onVisibleProductsChange]);
+
   return (
-    <div 
+    <div
       className="video-container relative rounded-lg overflow-hidden shadow-lg bg-black"
       ref={playerContainerRef}
       onMouseEnter={handleMouseEnter}
@@ -137,14 +150,14 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
           },
         }}
       />
-      
+
       {/* Product Markers Overlay */}
       <div className="absolute inset-0 pointer-events-none">
         {visibleProducts.map(product => (
           <button
             key={product.product_name}
             className="product-marker absolute w-10 h-10 rounded-full bg-primary bg-opacity-70 flex items-center justify-center cursor-pointer pointer-events-auto animate-pulse-slow transition-transform duration-300 ease-in-out"
-            style={{ 
+            style={{
               ...calculateMarkerPosition(product),
               transform: 'translate(-50%, -50%)'
             }}
@@ -159,28 +172,28 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
           </button>
         ))}
       </div>
-      
+
       {/* Custom Video Controls */}
-      <div 
+      <div
         className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 transition-opacity duration-300 ${controlsVisible ? 'opacity-100' : 'opacity-0'}`}
       >
         {/* Progress bar */}
-        <div 
+        <div
           className="w-full h-1 bg-gray-600 rounded-full mb-3 cursor-pointer"
           onClick={handleProgressBarClick}
         >
-          <div 
+          <div
             className="h-full bg-primary rounded-full relative"
             style={{ width: `${(currentTime / duration) * 100}%` }}
           >
             <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-white rounded-full"></div>
           </div>
         </div>
-        
+
         {/* Controls row */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <button 
+            <button
               onClick={togglePlayPause}
               className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
               aria-label={playing ? 'Pause' : 'Play'}
@@ -191,7 +204,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
           </div>
-          
+
           <div className="text-white text-sm">
             {visibleProducts.length > 0 && (
               <span className="flex items-center">
