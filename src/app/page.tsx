@@ -138,6 +138,7 @@ export default function Home() {
   const [videoUrl, setVideoUrl] = useState<string>(DEMO_VIDEO_URL);
   const [products, setProducts] = useState<ProductDetection[]>([]);
   const [visibleProducts, setVisibleProducts] = useState<ProductDetection[]>([]);
+  const [collapsedProducts, setCollapsedProducts] = useState<Record<string, boolean>>({});
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [isLoadingRelated, setIsLoadingRelated] = useState<boolean>(false);
   const [useMockData, setUseMockData] = useState<boolean>(false);
@@ -207,8 +208,24 @@ export default function Home() {
     setVisibleProducts(products);
   }, []);
 
+  const handleToggleCollapse = useCallback((productName: string) => {
+    setCollapsedProducts((prev) => ({
+      ...prev,
+      [productName]: !prev[productName],
+    }));
+  }, []);
+
   const handleTimeUpdate = useCallback((time: number) => {
     setCurrentTime(time);
+    setCollapsedProducts((prev) => {
+      const newState = { ...prev };
+      MOCK_PRODUCTS.forEach((p) => {
+        if (time > p.timeline[1] && prev[p.product_name] !== false) {
+          newState[p.product_name] = true;
+        }
+      });
+      return newState;
+    });
   }, []);
 
   // Handle related product selection
@@ -312,7 +329,9 @@ export default function Home() {
       <div className="lg:w-1/3">
         {/* Product Detail Sidebar */}
         <ProductDetailSidebar
-          products={visibleProducts}
+          products={MOCK_PRODUCTS.filter(p => currentTime >= p.timeline[0])}
+          collapsedProducts={collapsedProducts}
+          onToggleCollapse={handleToggleCollapse}
           relatedProducts={MOCK_RELATED_PRODUCTS}
           onClose={() => {}}
           onAddToCart={() => {}}
