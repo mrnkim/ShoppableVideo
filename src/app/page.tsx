@@ -143,6 +143,7 @@ export default function Home() {
   const [isLoadingRelated, setIsLoadingRelated] = useState<boolean>(false);
   const [useMockData, setUseMockData] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(0);
+  const [manualToggled, setManualToggled] = useState<Record<string, boolean | undefined>>({});
 
   // Detect products in the video
   const handleDetectProducts = useCallback(async () => {
@@ -208,25 +209,51 @@ export default function Home() {
     setVisibleProducts(products);
   }, []);
 
-  const handleToggleCollapse = useCallback((productName: string) => {
+  const handleToggleCollapse = (productName: string) => {
     setCollapsedProducts((prev) => ({
       ...prev,
       [productName]: !prev[productName],
     }));
-  }, []);
+    setManualToggled((prev) => ({
+      ...prev,
+      [productName]: true,
+    }));
+  };
 
   const handleTimeUpdate = useCallback((time: number) => {
     setCurrentTime(time);
     setCollapsedProducts((prev) => {
+      let changed = false;
       const newState = { ...prev };
       MOCK_PRODUCTS.forEach((p) => {
-        if (time > p.timeline[1] && prev[p.product_name] !== false) {
-          newState[p.product_name] = true;
+        if (time >= p.timeline[0] && time <= p.timeline[1]) {
+          // 구간 내 진입 시 수동 토글 초기화하고 자동 펼침
+          if (manualToggled[p.product_name]) {
+            setManualToggled((prevManual) => ({
+              ...prevManual,
+              [p.product_name]: undefined,
+            }));
+          }
+          if (prev[p.product_name] !== false) {
+            newState[p.product_name] = false;
+            changed = true;
+            console.log(`[DEBUG] ${p.product_name}: 구간 내 → 자동 펼침`);
+          }
+        } else if (time > p.timeline[1]) {
+          if (manualToggled[p.product_name]) {
+            // 수동 토글이 있으면 자동 동작 무시
+            return;
+          }
+          if (prev[p.product_name] !== true) {
+            newState[p.product_name] = true;
+            changed = true;
+            console.log(`[DEBUG] ${p.product_name}: 구간 끝 → 자동 접힘`);
+          }
         }
       });
-      return newState;
+      return changed ? newState : prev;
     });
-  }, []);
+  }, [manualToggled]);
 
   // Handle related product selection
   const handleRelatedProductSelect = (product: RelatedProduct) => {
