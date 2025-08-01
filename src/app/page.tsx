@@ -5,12 +5,56 @@ import { ProductVideoPlayer } from '@/components/ProductVideoPlayer';
 import ProductDetailSidebar from '@/components/ProductDetailSidebar';
 import ShoppingCart from '@/components/ShoppingCart';
 import { ProductDetection, RelatedProduct } from '@/lib/twelvelabs';
-import { useTwelveLabs } from '@/contexts/TwelveLabsContext';
 import { useCart } from '@/contexts/CartContext';
-import { Info, ShoppingBag } from '@mui/icons-material';
+import { Info, ShoppingBag, ExpandMore } from '@mui/icons-material';
 
-// Demo video URL for when no video is selected
-const DEMO_VIDEO_URL = "/breakfast_burrito.mp4";
+// Types for video data from TwelveLabs API
+interface VideoItem {
+  _id: string;
+  created_at: string;
+  system_metadata?: {
+    filename?: string;
+    duration?: number;
+    video_title?: string;
+    fps?: number;
+    height?: number;
+    width?: number;
+    size?: number;
+    model_names?: string[];
+  };
+  hls?: {
+    video_url?: string;
+    thumbnail_urls?: string[];
+    status?: string;
+    updated_at?: string;
+  };
+}
+
+interface VideoDetail {
+  _id: string;
+  index_id?: string;
+  hls?: {
+    video_url?: string;
+    thumbnail_urls?: string[];
+    status?: string;
+    updated_at?: string;
+  };
+  system_metadata?: {
+    filename?: string;
+    duration?: number;
+    video_title?: string;
+    fps?: number;
+    height?: number;
+    width?: number;
+    size?: number;
+    model_names?: string[];
+  };
+  user_metadata?: Record<string, unknown>;
+  source?: Record<string, unknown>;
+  embedding?: Record<string, unknown>;
+}
+
+
 
 // Mock products for demonstration when API is not available
 const MOCK_PRODUCTS: ProductDetection[] = [
@@ -54,47 +98,6 @@ const MOCK_PRODUCTS: ProductDetection[] = [
     "price": "Not specified",
     "description": "The dough is shown resting on parchment paper next to a rolling pin, indicating it is part of the burrito-making process."
     }
-  // {
-  //   "timeline": [8.0, 9.0],
-  //   "brand": "Google",
-  //   "product_name": "Chromecast",
-  //   "location": [1000, 600, 100, 100],
-  //   "price": "$35",
-  //   "description": "The Chromecast is shown being plugged into an HDMI port, and the text 'Everything you love now on your TV.' appears on the screen, implying that it allows streaming of content directly to a TV."
-  // }
-  // {
-  //   id: "p1",
-  //   name: "Vintage Leather Jacket",
-  //   description: "Premium quality leather jacket with distressed finish",
-  //   price: 199.99,
-  //   category: "Apparel",
-  //   position: { x: 45, y: 30 },
-  //   timeAppearance: [3, 15],
-  //   confidence: 0.92,
-  //   aiGeneratedContext: "This rugged leather jacket is perfect for casual outings. The actor is wearing it in an outdoor setting, suggesting it's suitable for fall weather."
-  // },
-  // {
-  //   id: "p2",
-  //   name: "Smart Watch Pro",
-  //   description: "Next-gen smartwatch with health monitoring features",
-  //   price: 299.99,
-  //   category: "Electronics",
-  //   position: { x: 70, y: 40 },
-  //   timeAppearance: [8, 20],
-  //   confidence: 0.87,
-  //   aiGeneratedContext: "The smartwatch shown in this active scene provides fitness tracking and notification features. The character checks it frequently, highlighting its practical everyday use."
-  // },
-  // {
-  //   id: "p3",
-  //   name: "Designer Sunglasses",
-  //   description: "UV protected polarized designer sunglasses",
-  //   price: 149.99,
-  //   category: "Accessories",
-  //   position: { x: 30, y: 20 },
-  //   timeAppearance: [12, 25],
-  //   confidence: 0.89,
-  //   aiGeneratedContext: "These stylish sunglasses appear in the bright outdoor scene, providing both UV protection and a fashionable look that complements the character's outfit."
-  // }
 ];
 
 // Mock related products
@@ -118,24 +121,12 @@ const MOCK_RELATED_PRODUCTS: RelatedProduct[] = [
 ];
 
 export default function Home() {
-  // TwelveLabs context
-  const {
-    client,
-    isInitialized,
-    currentVideo,
-    currentIndex,
-    detectProducts,
-    findRelatedProducts,
-    isDetectingProducts,
-    isFindingRelatedProducts,
-    error
-  } = useTwelveLabs();
 
   // Cart context
   const { addItem, updateQuantity, items, isCartOpen, toggleCart, clearCart } = useCart();
 
   // State variables
-  const [videoUrl, setVideoUrl] = useState<string>(DEMO_VIDEO_URL);
+  const [videoUrl, setVideoUrl] = useState<string>('');
   const [products, setProducts] = useState<ProductDetection[]>([]);
   const [visibleProducts, setVisibleProducts] = useState<ProductDetection[]>([]);
   const [collapsedProducts, setCollapsedProducts] = useState<Record<string, boolean>>({});
@@ -144,60 +135,97 @@ export default function Home() {
   const [useMockData, setUseMockData] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [manualToggled, setManualToggled] = useState<Record<string, boolean | undefined>>({});
+  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<ProductDetection | null>(null);
+
+  // New state for video management
+  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [selectedVideoId, setSelectedVideoId] = useState<string>('');
+  const [isLoadingVideos, setIsLoadingVideos] = useState<boolean>(false);
+  const [isLoadingVideoDetail, setIsLoadingVideoDetail] = useState<boolean>(false);
+  const [videoDetail, setVideoDetail] = useState<VideoDetail | null>(null);
+
+  // Load videos from TwelveLabs index
+  const loadVideos = useCallback(async () => {
+    const defaultIndexId = process.env.NEXT_PUBLIC_DEFAULT_INDEX_ID;
+    if (!defaultIndexId) {
+      console.error('Default index ID not configured');
+      return;
+    }
+
+    setIsLoadingVideos(true);
+    try {
+      const response = await fetch(`/api/videos?index_id=${defaultIndexId}&limit=50`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch videos: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setVideos(data.data || []);
+
+      // Select the most recent video by default (first in the list since API returns newest first)
+      if (data.data && data.data.length > 0) {
+        setSelectedVideoId(data.data[0]._id);
+      }
+    } catch (error) {
+      console.error('Error loading videos:', error);
+      setUseMockData(true);
+    } finally {
+      setIsLoadingVideos(false);
+    }
+  }, []);
+
+  // Load video detail when a video is selected
+  const loadVideoDetail = useCallback(async (videoId: string) => {
+    const defaultIndexId = process.env.NEXT_PUBLIC_DEFAULT_INDEX_ID;
+    if (!defaultIndexId || !videoId) {
+      return;
+    }
+
+    setIsLoadingVideoDetail(true);
+    try {
+      const response = await fetch(`/api/videos/${videoId}?indexId=${defaultIndexId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch video detail: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      setVideoDetail(data);
+
+      // Set video URL from HLS data if available
+      if (data.hls?.video_url) {
+        setVideoUrl(data.hls.video_url);
+      } else {
+        // If no HLS URL available, set an empty string
+        setVideoUrl('');
+        console.warn('No HLS video URL available for this video');
+      }
+    } catch (error) {
+      console.error('Error loading video detail:', error);
+      setVideoUrl('');
+    } finally {
+      setIsLoadingVideoDetail(false);
+    }
+  }, []);
+
+  // Handle video selection
+  const handleVideoSelect = useCallback((videoId: string) => {
+    setSelectedVideoId(videoId);
+    loadVideoDetail(videoId);
+  }, [loadVideoDetail]);
 
   // Detect products in the video
   const handleDetectProducts = useCallback(async () => {
-    if (!currentVideo || !currentIndex) {
-      // Use mock data if no video or index is selected
-      setUseMockData(true);
-      setProducts(MOCK_PRODUCTS);
-      return;
-    }
-
-    setIsLoadingProducts(true);
-    setUseMockData(false);
-
-    try {
-      // Use the TwelveLabs client to detect products
-      const detectedProducts = await detectProducts(currentIndex._id, currentVideo._id);
-      setProducts(detectedProducts);
-    } catch (error) {
-      console.error("Error detecting products:", error);
-      // Fallback to mock data if API fails
-      setProducts(MOCK_PRODUCTS);
-      setUseMockData(true);
-    } finally {
-      setIsLoadingProducts(false);
-    }
-  }, [currentVideo, currentIndex, detectProducts]);
+    // For now, use mock data since we're not using the TwelveLabs context
+    setUseMockData(true);
+    setProducts(MOCK_PRODUCTS);
+  }, []);
 
   // Find related products when a product is selected
   const handleFindRelatedProducts = useCallback(async (product: ProductDetection) => {
-    if (!currentIndex || useMockData) {
-      setRelatedProducts(MOCK_RELATED_PRODUCTS);
-      return;
-    }
-
-    setIsLoadingRelated(true);
-
-    try {
-      // Use the TwelveLabs client to find related products
-      const related = await findRelatedProducts({
-        indexId: currentIndex._id,
-        productId: product.product_name,
-        category: "Electronics",
-        productName: product.product_name,
-        timeRange: product.timeline,
-        limit: 4
-      });
-      setRelatedProducts(related);
-    } catch (error) {
-      console.error("Error finding related products:", error);
-      setRelatedProducts(MOCK_RELATED_PRODUCTS);
-    } finally {
-      setIsLoadingRelated(false);
-    }
-  }, [currentIndex, findRelatedProducts, useMockData]);
+    // For now, use mock data since we're not using the TwelveLabs context
+    setRelatedProducts(MOCK_RELATED_PRODUCTS);
+  }, []);
 
   // Handle product selection
   const handleProductSelect = useCallback((product: ProductDetection) => {
@@ -266,15 +294,20 @@ export default function Home() {
     clearCart();
   };
 
-  // Initialize products when component mounts or when video/index changes
+  // Initialize videos when component mounts
   useEffect(() => {
-    if (currentVideo) {
-      // Set video URL from current video if available
-      // In a real app, you would get the URL from the TwelveLabs API
-      // For demo, we'll continue using the demo URL
-      setVideoUrl(DEMO_VIDEO_URL);
-    }
+    loadVideos();
+  }, [loadVideos]);
 
+  // Load video detail when selected video changes
+  useEffect(() => {
+    if (selectedVideoId) {
+      loadVideoDetail(selectedVideoId);
+    }
+  }, [selectedVideoId, loadVideoDetail]);
+
+  // Initialize products when component mounts
+  useEffect(() => {
     // Detect products with a small delay to ensure video is loaded
     // This helps maintain the <2s latency requirement
     const timer = setTimeout(() => {
@@ -282,12 +315,45 @@ export default function Home() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [currentVideo, currentIndex, handleDetectProducts]);
+  }, [handleDetectProducts]);
+
+  // Get display name for video
+  const getVideoDisplayName = (video: VideoItem) => {
+    return video.system_metadata?.filename ||
+           video.system_metadata?.video_title ||
+           `Video ${video._id.slice(-8)}`;
+  };
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="lg:w-2/3">
         <h1 className="text-2xl font-bold mb-4">Shoppable Video Experience</h1>
+
+        {/* Video Selection Dropdown */}
+        <div className="mb-6">
+          <div className="relative">
+            <select
+              id="video-select"
+              value={selectedVideoId}
+              onChange={(e) => handleVideoSelect(e.target.value)}
+              disabled={isLoadingVideos}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            >
+              {isLoadingVideos ? (
+                <option>Loading videos...</option>
+              ) : videos.length === 0 ? (
+                <option>No videos available</option>
+              ) : (
+                videos.map((video) => (
+                  <option key={video._id} value={video._id}>
+                    {getVideoDisplayName(video)}
+                  </option>
+                ))
+              )}
+            </select>
+            <ExpandMore className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          </div>
+        </div>
 
         <div className="flex items-center mb-6 text-sm">
           <div className={`px-3 py-1 rounded-full mr-3 flex items-center ${useMockData ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
@@ -301,6 +367,13 @@ export default function Home() {
               Detecting Products...
             </div>
           )}
+
+          {isLoadingVideoDetail && (
+            <div className="flex items-center text-blue-600">
+              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
+              Loading Video...
+            </div>
+          )}
         </div>
 
         <p className="text-gray-600 mb-6">
@@ -309,8 +382,9 @@ export default function Home() {
 
         {/* Video Player with Product Overlays */}
         <ProductVideoPlayer
-          videoUrl={DEMO_VIDEO_URL}
+          videoUrl={videoUrl}
           products={MOCK_PRODUCTS}
+          onProductSelect={handleProductSelect}
           onVisibleProductsChange={handleVisibleProductsChange}
           onTimeUpdate={handleTimeUpdate}
           autoPlay={true}
