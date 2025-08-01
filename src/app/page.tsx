@@ -57,7 +57,8 @@ interface VideoDetail {
 
 
 // Mock products for demonstration when API is not available
-const MOCK_PRODUCTS: ProductDetection[] = [
+const MOCK_PRODUCTS: ProductDetection[] =
+[
   {
     "timeline": [13.0, 16.0],
     "brand": "Jennie-O",
@@ -98,27 +99,9 @@ const MOCK_PRODUCTS: ProductDetection[] = [
     "price": "Not specified",
     "description": "The dough is shown resting on parchment paper next to a rolling pin, indicating it is part of the burrito-making process."
     }
-];
+]
 
-// Mock related products
-const MOCK_RELATED_PRODUCTS: RelatedProduct[] = [
-  {
-    id: "r1",
-    name: "Denim Jeans",
-    description: "Classic blue denim jeans with straight fit",
-    price: 89.99,
-    category: "Apparel",
-    whyRecommended: "These jeans pair perfectly with the leather jacket for a complete casual look."
-  },
-  {
-    id: "r2",
-    name: "Leather Boots",
-    description: "Premium leather boots with rubber sole",
-    price: 149.99,
-    category: "Footwear",
-    whyRecommended: "Complete the rugged outdoor look with these matching leather boots."
-  }
-];
+
 
 export default function Home() {
 
@@ -150,6 +133,8 @@ export default function Home() {
     const defaultIndexId = process.env.NEXT_PUBLIC_DEFAULT_INDEX_ID;
     if (!defaultIndexId) {
       console.error('Default index ID not configured');
+      setUseMockData(true);
+      setVideoUrl('/breakfast_burrito.mp4');
       return;
     }
 
@@ -166,10 +151,15 @@ export default function Home() {
       // Select the most recent video by default (first in the list since API returns newest first)
       if (data.data && data.data.length > 0) {
         setSelectedVideoId(data.data[0]._id);
+      } else {
+        // No videos found, use mock data
+        setUseMockData(true);
+        setVideoUrl('/breakfast_burrito.mp4');
       }
     } catch (error) {
       console.error('Error loading videos:', error);
       setUseMockData(true);
+      setVideoUrl('/breakfast_burrito.mp4');
     } finally {
       setIsLoadingVideos(false);
     }
@@ -196,13 +186,15 @@ export default function Home() {
       if (data.hls?.video_url) {
         setVideoUrl(data.hls.video_url);
       } else {
-        // If no HLS URL available, set an empty string
-        setVideoUrl('');
-        console.warn('No HLS video URL available for this video');
+        // If no HLS URL available, use mock video
+        setVideoUrl('/breakfast_burrito.mp4');
+        setUseMockData(true);
+        console.warn('No HLS video URL available for this video, using mock video');
       }
     } catch (error) {
       console.error('Error loading video detail:', error);
-      setVideoUrl('');
+      setVideoUrl('/breakfast_burrito.mp4');
+      setUseMockData(true);
     } finally {
       setIsLoadingVideoDetail(false);
     }
@@ -223,8 +215,8 @@ export default function Home() {
 
   // Find related products when a product is selected
   const handleFindRelatedProducts = useCallback(async (product: ProductDetection) => {
-    // For now, use mock data since we're not using the TwelveLabs context
-    setRelatedProducts(MOCK_RELATED_PRODUCTS);
+    // For now, set empty array since we're not using related products
+    setRelatedProducts([]);
   }, []);
 
   // Handle product selection
@@ -382,7 +374,7 @@ export default function Home() {
         {videoUrl ? (
           <ProductVideoPlayer
             videoUrl={videoUrl}
-            products={MOCK_PRODUCTS}
+            products={useMockData ? MOCK_PRODUCTS : products}
             onProductSelect={handleProductSelect}
             onVisibleProductsChange={handleVisibleProductsChange}
             onTimeUpdate={handleTimeUpdate}
@@ -437,10 +429,10 @@ export default function Home() {
       <div className="lg:w-1/3">
         {/* Product Detail Sidebar */}
         <ProductDetailSidebar
-          products={MOCK_PRODUCTS.filter(p => currentTime >= p.timeline[0])}
+          products={(useMockData ? MOCK_PRODUCTS : products).filter(p => currentTime >= p.timeline[0])}
           collapsedProducts={collapsedProducts}
           onToggleCollapse={handleToggleCollapse}
-          relatedProducts={MOCK_RELATED_PRODUCTS}
+          relatedProducts={[]}
           onClose={() => {}}
           onAddToCart={() => {}}
           onRelatedProductSelect={() => {}}
