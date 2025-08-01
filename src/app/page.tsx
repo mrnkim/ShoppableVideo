@@ -126,6 +126,7 @@ export default function Home() {
   const [selectedVideoId, setSelectedVideoId] = useState<string>('');
   const [isLoadingVideos, setIsLoadingVideos] = useState<boolean>(false);
   const [isLoadingVideoDetail, setIsLoadingVideoDetail] = useState<boolean>(false);
+  const [isAnalyzingVideo, setIsAnalyzingVideo] = useState<boolean>(false);
   const [videoDetail, setVideoDetail] = useState<VideoDetail | null>(null);
 
   // Load videos from TwelveLabs index
@@ -158,6 +159,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error loading videos:', error);
+      console.log('🔄 Setting useMockData=true due to video loading error');
       setUseMockData(true);
       setVideoUrl('/breakfast_burrito.mp4');
     } finally {
@@ -174,6 +176,7 @@ export default function Home() {
 
     setIsLoadingVideoDetail(true);
     try {
+      console.log('🎬 Loading video detail for videoId:', videoId);
       const response = await fetch(`/api/videos/${videoId}?indexId=${defaultIndexId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch video detail: ${response.statusText}`);
@@ -181,22 +184,160 @@ export default function Home() {
 
       const data = await response.json();
       setVideoDetail(data);
+      console.log('📹 Video detail loaded:', data);
 
-      // Set video URL from HLS data if available
+      // Check if custom metadata exists and generate if needed BEFORE setting video URL
+      console.log('🔍 Checking metadata before setting video URL...');
+      await checkAndGenerateMetadata(videoId, defaultIndexId, data);
+
+      // Set video URL from HLS data if available (AFTER metadata check)
       if (data.hls?.video_url) {
+        console.log('🎥 Setting HLS video URL:', data.hls.video_url);
         setVideoUrl(data.hls.video_url);
+        console.log('🎥 HLS URL set, keeping useMockData as is');
       } else {
         // If no HLS URL available, use mock video
+        console.log('🎥 No HLS URL, using mock video');
         setVideoUrl('/breakfast_burrito.mp4');
         setUseMockData(true);
         console.warn('No HLS video URL available for this video, using mock video');
       }
     } catch (error) {
-      console.error('Error loading video detail:', error);
+      console.error('❌ Error loading video detail:', error);
       setVideoUrl('/breakfast_burrito.mp4');
       setUseMockData(true);
     } finally {
       setIsLoadingVideoDetail(false);
+    }
+  }, []);
+
+  // Check and generate metadata if needed
+  const checkAndGenerateMetadata = useCallback(async (videoId: string, indexId: string, videoData: VideoDetail) => {
+    // Check if custom metadata already exists
+    if (videoData.user_metadata && Object.keys(videoData.user_metadata).length > 0) {
+      console.log('✅ Custom metadata already exists for this video:', videoData.user_metadata);
+      // Use existing metadata
+      if (videoData.user_metadata.products) {
+        let existingProducts;
+        try {
+          // Parse products if it's stored as JSON string
+          if (typeof videoData.user_metadata.products === 'string') {
+            existingProducts = JSON.parse(videoData.user_metadata.products);
+          } else {
+            existingProducts = videoData.user_metadata.products;
+          }
+
+          console.log('📦 Using existing products from metadata:', existingProducts);
+          setProducts(existingProducts);
+          setUseMockData(false);
+          console.log('✅ Set useMockData=false for existing metadata');
+        } catch (parseError) {
+          console.error('❌ Error parsing existing products:', parseError);
+          setUseMockData(true);
+        }
+      }
+      return;
+    }
+
+    console.log('🔍 No custom metadata found, generating product analysis...');
+    setIsAnalyzingVideo(true);
+
+    try {
+      // Call analyze API to generate product information
+      console.log('📡 Calling analyze API for videoId:', videoId);
+      const analyzeResponse = await fetch(`/api/analyze?videoId=${videoId}`);
+      console.log('📡 Analyze API response status:', analyzeResponse.status);
+
+      if (!analyzeResponse.ok) {
+        const errorText = await analyzeResponse.text();
+        console.error('❌ Analyze API error:', errorText);
+        throw new Error(`Failed to analyze video: ${analyzeResponse.statusText} - ${errorText}`);
+      }
+
+      const analyzeData = await analyzeResponse.json();
+      console.log('📊 Analysis result:', analyzeData);
+
+      // Extract products from the analysis response
+      if (analyzeData.data) {
+        console.log('📄 Raw data string:', analyzeData.data);
+
+                // Parse the response data
+        let products = [];
+        try {
+          let jsonString = analyzeData.data;
+
+          // Check if it's still wrapped in markdown code blocks (fallback)
+          if (jsonString.includes('```json')) {
+            console.log('🔧 Detected markdown formatting, cleaning...');
+            jsonString = jsonString
+              .replace(/```json\n?/g, '')  // Remove opening ```json
+              .replace(/```\n?/g, '')      // Remove closing ```
+              .trim();                     // Remove extra whitespace
+          }
+
+          console.log('🔧 JSON string to parse:', jsonString);
+
+          products = JSON.parse(jsonString);
+          console.log('📦 Parsed products:', products);
+
+          if (!Array.isArray(products)) {
+            throw new Error('Parsed data is not an array');
+          }
+        } catch (parseError) {
+          console.error('❌ Error parsing JSON from analysis response:', parseError);
+          throw new Error(`Failed to parse products data: ${parseError instanceof Error ? parseError.message : 'Unknown parsing error'}`);
+        }
+
+        // Save the generated metadata
+        console.log('💾 Saving metadata to TwelveLabs...');
+        const saveRequestBody = {
+          videoId: videoId,
+          indexId: indexId,
+          metadata: {
+            products: products,
+            analyzed_at: new Date().toISOString()
+          }
+        };
+        console.log('💾 Save request body:', saveRequestBody);
+
+        const saveResponse = await fetch('/api/videos/saveMetadata', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(saveRequestBody)
+        });
+
+        console.log('💾 Save API response status:', saveResponse.status);
+
+        if (!saveResponse.ok) {
+          const errorText = await saveResponse.text();
+          console.error('❌ Save API error:', errorText);
+          throw new Error(`Failed to save metadata: ${saveResponse.statusText} - ${errorText}`);
+        }
+
+        const saveResult = await saveResponse.json();
+        console.log('✅ Metadata saved successfully:', saveResult);
+
+        // Update local state with the generated products
+        console.log('🔄 Updating local state with generated products:', products);
+        console.log('🔄 Before: useMockData =', useMockData);
+        setProducts(products);
+        setUseMockData(false);
+        console.log('✅ Mock data disabled, using real products');
+        console.log('🔄 After setUseMockData(false) called');
+      } else {
+        console.warn('⚠️ No data field in analysis response');
+        throw new Error('No data field received from analysis');
+      }
+    } catch (error) {
+      console.error('❌ Error generating metadata:', error);
+      // Fallback to mock data
+      console.log('🔄 Falling back to mock data');
+      setUseMockData(true);
+      setProducts(MOCK_PRODUCTS);
+    } finally {
+      setIsAnalyzingVideo(false);
     }
   }, []);
 
@@ -208,10 +349,15 @@ export default function Home() {
 
   // Detect products in the video
   const handleDetectProducts = useCallback(async () => {
-    // For now, use mock data since we're not using the TwelveLabs context
+    // If we already have products from metadata analysis, use them
+    if (products.length > 0 && !useMockData) {
+      return;
+    }
+
+    // Otherwise, use mock data
     setUseMockData(true);
     setProducts(MOCK_PRODUCTS);
-  }, []);
+  }, [products.length, useMockData]);
 
   // Find related products when a product is selected
   const handleFindRelatedProducts = useCallback(async (product: ProductDetection) => {
@@ -245,7 +391,9 @@ export default function Home() {
     setCollapsedProducts((prev) => {
       let changed = false;
       const newState = { ...prev };
-      MOCK_PRODUCTS.forEach((p) => {
+      const currentProducts = useMockData ? MOCK_PRODUCTS : products;
+
+      currentProducts.forEach((p) => {
         if (time >= p.timeline[0] && time <= p.timeline[1]) {
           // 구간 내 진입 시 수동 토글 초기화하고 자동 펼침
           if (manualToggled[p.product_name]) {
@@ -271,7 +419,7 @@ export default function Home() {
       });
       return changed ? newState : prev;
     });
-  }, [manualToggled]);
+  }, [manualToggled, useMockData, products]);
 
   // Handle related product selection
   const handleRelatedProductSelect = (product: RelatedProduct) => {
@@ -306,6 +454,11 @@ export default function Home() {
 
     return () => clearTimeout(timer);
   }, [handleDetectProducts]);
+
+  // Debug useEffect to track useMockData changes
+  useEffect(() => {
+    console.log('🔍 useMockData changed to:', useMockData);
+  }, [useMockData]);
 
   // Get display name for video
   const getVideoDisplayName = (video: VideoItem) => {
@@ -364,6 +517,13 @@ export default function Home() {
               Loading Video...
             </div>
           )}
+
+          {isAnalyzingVideo && (
+            <div className="flex items-center text-purple-600">
+              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
+              Analyzing Products...
+            </div>
+          )}
         </div>
 
         <p className="text-gray-600 mb-6">
@@ -388,6 +548,13 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* Debug info */}
+        <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
+          <p>Debug: useMockData = {useMockData.toString()}</p>
+          <p>Debug: products count = {products.length}</p>
+          <p>Debug: current products = {JSON.stringify(products.slice(0, 2))}</p>
+        </div>
 
         {/* Video Description */}
         {/* <div className="mt-6 p-4 bg-white rounded-lg shadow">
@@ -438,6 +605,13 @@ export default function Home() {
           onRelatedProductSelect={() => {}}
           isLoading={false}
         />
+
+        {/* Debug info for sidebar */}
+        <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
+          <p>Sidebar Debug: useMockData = {useMockData.toString()}</p>
+          <p>Sidebar Debug: currentTime = {currentTime}</p>
+          <p>Sidebar Debug: filtered products count = {(useMockData ? MOCK_PRODUCTS : products).filter(p => currentTime >= p.timeline[0]).length}</p>
+        </div>
 
         {/* Shopping Cart */}
         {/* <ShoppingCart
