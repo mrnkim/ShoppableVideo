@@ -177,7 +177,7 @@ export default function Home() {
 
   // Load video detail when a video is selected
   const loadVideoDetail = useCallback(async (videoId: string) => {
-    const defaultIndexId = process.env.NEXT_PUBLIC_DEFAULT_INDEX_ID;
+    const defaultIndexId = '688020fe934487793c56c6a7'; // From your .env file
     if (!defaultIndexId || !videoId) {
       return;
     }
@@ -265,7 +265,6 @@ export default function Home() {
           if (prev[p.product_name] !== false) {
             newState[p.product_name] = false;
             changed = true;
-            console.log(`[DEBUG] ${p.product_name}: 구간 내 → 자동 펼침`);
           }
         } else if (time > p.timeline[1]) {
           if (manualToggled[p.product_name]) {
@@ -275,7 +274,6 @@ export default function Home() {
           if (prev[p.product_name] !== true) {
             newState[p.product_name] = true;
             changed = true;
-            console.log(`[DEBUG] ${p.product_name}: 구간 끝 → 자동 접힘`);
           }
         }
       });
@@ -340,9 +338,9 @@ export default function Home() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
               {isLoadingVideos ? (
-                <option>Loading videos...</option>
+                <option value="">Loading videos...</option>
               ) : videos.length === 0 ? (
-                <option>No videos available</option>
+                <option value="">No videos available</option>
               ) : (
                 videos.map((video) => (
                   <option key={video._id} value={video._id}>
@@ -381,14 +379,23 @@ export default function Home() {
         </p>
 
         {/* Video Player with Product Overlays */}
-        <ProductVideoPlayer
-          videoUrl={videoUrl}
-          products={MOCK_PRODUCTS}
-          onProductSelect={handleProductSelect}
-          onVisibleProductsChange={handleVisibleProductsChange}
-          onTimeUpdate={handleTimeUpdate}
-          autoPlay={true}
-        />
+        {videoUrl ? (
+          <ProductVideoPlayer
+            videoUrl={videoUrl}
+            products={MOCK_PRODUCTS}
+            onProductSelect={handleProductSelect}
+            onVisibleProductsChange={handleVisibleProductsChange}
+            onTimeUpdate={handleTimeUpdate}
+            autoPlay={true}
+          />
+        ) : (
+          <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading video...</p>
+            </div>
+          </div>
+        )}
 
         {/* Video Description */}
         {/* <div className="mt-6 p-4 bg-white rounded-lg shadow">
