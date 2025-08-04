@@ -549,13 +549,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Debug info */}
-        <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
-          <p>Debug: useMockData = {useMockData.toString()}</p>
-          <p>Debug: products count = {products.length}</p>
-          <p>Debug: current products = {JSON.stringify(products.slice(0, 2))}</p>
-        </div>
-
         {/* Video Description */}
         {/* <div className="mt-6 p-4 bg-white rounded-lg shadow">
           <h2 className="text-xl font-semibold">About This Video</h2>
@@ -605,13 +598,6 @@ export default function Home() {
           onRelatedProductSelect={() => {}}
           isLoading={false}
         />
-
-        {/* Debug info for sidebar */}
-        <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
-          <p>Sidebar Debug: useMockData = {useMockData.toString()}</p>
-          <p>Sidebar Debug: currentTime = {currentTime}</p>
-          <p>Sidebar Debug: filtered products count = {(useMockData ? MOCK_PRODUCTS : products).filter(p => currentTime >= p.timeline[0]).length}</p>
-        </div>
 
         {/* Shopping Cart */}
         {/* <ShoppingCart
