@@ -19,7 +19,7 @@ interface RelatedProduct {
 interface ProductDetailSidebarProps {
   products: Product[];
   collapsedProducts: Record<string, boolean>;
-  onToggleCollapse: (productName: string, brand: string) => void;
+  onToggleCollapse: (productName: string, brand: string, timeline: [number, number]) => void;
   relatedProducts: RelatedProduct[];
   onClose: () => void;
   onAddToCart: (product: Product) => void;
@@ -100,7 +100,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 mb-6 overflow-y-auto max-h-[calc(100vh-200px)] product-sidebar">
       {products.map((product, index) => {
-        const uniqueKey = `${product.brand}-${product.product_name}`;
+        const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
         const isCollapsed = collapsedProducts[uniqueKey];
         const reactKey = `product-${index}`;
 
@@ -124,7 +124,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                 <span className={`text-xl font-semibold truncate flex-1 ${titleColor}`}>{product.product_name}</span>
                 <button
                   className="ml-2 flex-shrink-0"
-                  onClick={() => onToggleCollapse(product.product_name, product.brand)}
+                  onClick={() => onToggleCollapse(product.product_name, product.brand, product.timeline)}
                   aria-label="펼치기"
                 >
                   <KeyboardArrowDown />
@@ -143,7 +143,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                   </div>
                   <button
                     className="ml-2 flex-shrink-0"
-                    onClick={() => onToggleCollapse(product.product_name, product.brand)}
+                    onClick={() => onToggleCollapse(product.product_name, product.brand, product.timeline)}
                     aria-label="접기"
                   >
                     <KeyboardArrowUp />

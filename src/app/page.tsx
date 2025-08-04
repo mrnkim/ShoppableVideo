@@ -235,7 +235,7 @@ export default function Home() {
           // Initialize all products as collapsed
           const initialCollapsedState: Record<string, boolean> = {};
           existingProducts.forEach((product: ProductDetection) => {
-            const uniqueKey = `${product.brand}-${product.product_name}`;
+            const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
             initialCollapsedState[uniqueKey] = true;
           });
           setCollapsedProducts(initialCollapsedState);
@@ -338,7 +338,7 @@ export default function Home() {
         // Initialize all products as collapsed
         const initialCollapsedState: Record<string, boolean> = {};
         products.forEach(product => {
-          const uniqueKey = `${product.brand}-${product.product_name}`;
+          const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
           initialCollapsedState[uniqueKey] = true;
         });
         setCollapsedProducts(initialCollapsedState);
@@ -377,7 +377,7 @@ export default function Home() {
     // Initialize all products as collapsed
     const initialCollapsedState: Record<string, boolean> = {};
     MOCK_PRODUCTS.forEach(product => {
-      const uniqueKey = `${product.brand}-${product.product_name}`;
+      const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
       initialCollapsedState[uniqueKey] = true;
     });
     setCollapsedProducts(initialCollapsedState);
@@ -399,8 +399,8 @@ export default function Home() {
     setVisibleProducts(products);
   }, []);
 
-  const handleToggleCollapse = (productName: string, brand: string) => {
-    const uniqueKey = `${brand}-${productName}`;
+  const handleToggleCollapse = (productName: string, brand: string, timeline: [number, number]) => {
+    const uniqueKey = `${brand}-${productName}-${timeline[0]}-${timeline[1]}`;
     setCollapsedProducts((prev) => ({
       ...prev,
       [uniqueKey]: !prev[uniqueKey],
@@ -419,7 +419,7 @@ export default function Home() {
       const currentProducts = useMockData ? MOCK_PRODUCTS : products;
 
       currentProducts.forEach((p) => {
-        const uniqueKey = `${p.brand}-${p.product_name}`;
+        const uniqueKey = `${p.brand}-${p.product_name}-${p.timeline[0]}-${p.timeline[1]}`;
         if (time >= p.timeline[0] && time <= p.timeline[1]) {
           // 구간 내 진입 시 수동 토글 초기화하고 자동 펼침
           if (manualToggled[uniqueKey]) {
