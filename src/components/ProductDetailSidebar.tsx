@@ -105,10 +105,13 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
         return (
           <div key={reactKey} className="mb-6">
             {isCollapsed ? (
-              <div className="flex items-center gap-2">
-                <span className="font-semibold">{product.product_name}</span>
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                  {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
+                </div>
+                <span className="text-xl font-semibold truncate flex-1">{product.product_name}</span>
                 <button
-                  className="ml-2"
+                  className="ml-2 flex-shrink-0"
                   onClick={() => onToggleCollapse(product.product_name, product.brand)}
                   aria-label="펼치기"
                 >
@@ -118,9 +121,14 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
             ) : (
               <div>
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold">{product.product_name}</h2>
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                      {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
+                    </div>
+                    <h2 className="text-xl font-semibold truncate">{product.product_name}</h2>
+                  </div>
                   <button
-                    className="ml-2"
+                    className="ml-2 flex-shrink-0"
                     onClick={() => onToggleCollapse(product.product_name, product.brand)}
                     aria-label="접기"
                   >
@@ -128,22 +136,16 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                   </button>
                 </div>
                 <div className="mb-4">
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Price:</span>
+                  <div className="mb-2">
+                    <span className="text-gray-600">Price: </span>
                     <span className="font-semibold">{product.price}</span>
                   </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="text-gray-600">Brand:</span>
+                  <div className="mb-2">
+                    <span className="text-gray-600">Brand: </span>
                     <span>{product.brand}</span>
                   </div>
                 </div>
                 <p className="text-gray-700 mb-4">{product.description}</p>
-                <div className="bg-blue-50 p-3 rounded-lg mb-4">
-                  <h3 className="text-sm font-medium text-blue-800 mb-1">Appears in Video</h3>
-                  <p className="text-sm text-blue-700">
-                    {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
-                  </p>
-                </div>
                 <button
                   className="w-full bg-primary hover:bg-opacity-90 text-secondary font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
                   onClick={() => {
