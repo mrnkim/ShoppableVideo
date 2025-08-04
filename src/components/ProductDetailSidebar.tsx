@@ -19,7 +19,7 @@ interface RelatedProduct {
 interface ProductDetailSidebarProps {
   products: Product[];
   collapsedProducts: Record<string, boolean>;
-  onToggleCollapse: (productName: string) => void;
+  onToggleCollapse: (productName: string, brand: string) => void;
   relatedProducts: RelatedProduct[];
   onClose: () => void;
   onAddToCart: (product: Product) => void;
@@ -27,7 +27,7 @@ interface ProductDetailSidebarProps {
   isLoading?: boolean;
 }
 
-const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
+const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   products,
   collapsedProducts,
   onToggleCollapse,
@@ -97,16 +97,19 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-4 mb-6 overflow-y-auto max-h-[calc(100vh-200px)] product-sidebar">
-      {products.map((product) => {
-        const isCollapsed = collapsedProducts[product.product_name];
+      {products.map((product, index) => {
+        const uniqueKey = `${product.brand}-${product.product_name}`;
+        const isCollapsed = collapsedProducts[uniqueKey];
+        // Use simple index-based key for stability
+        const reactKey = `product-${index}`;
         return (
-          <div key={product.product_name} className="mb-6">
+          <div key={reactKey} className="mb-6">
             {isCollapsed ? (
               <div className="flex items-center gap-2">
                 <span className="font-semibold">{product.product_name}</span>
                 <button
                   className="ml-2"
-                  onClick={() => onToggleCollapse(product.product_name)}
+                  onClick={() => onToggleCollapse(product.product_name, product.brand)}
                   aria-label="펼치기"
                 >
                   <KeyboardArrowDown />
@@ -118,7 +121,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
                   <h2 className="text-xl font-semibold">{product.product_name}</h2>
                   <button
                     className="ml-2"
-                    onClick={() => onToggleCollapse(product.product_name)}
+                    onClick={() => onToggleCollapse(product.product_name, product.brand)}
                     aria-label="접기"
                   >
                     <KeyboardArrowUp />
@@ -158,6 +161,6 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = ({
       })}
     </div>
   );
-};
+});
 
 export default ProductDetailSidebar;

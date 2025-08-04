@@ -375,14 +375,15 @@ export default function Home() {
     setVisibleProducts(products);
   }, []);
 
-  const handleToggleCollapse = (productName: string) => {
+  const handleToggleCollapse = (productName: string, brand: string) => {
+    const uniqueKey = `${brand}-${productName}`;
     setCollapsedProducts((prev) => ({
       ...prev,
-      [productName]: !prev[productName],
+      [uniqueKey]: !prev[uniqueKey],
     }));
     setManualToggled((prev) => ({
       ...prev,
-      [productName]: true,
+      [uniqueKey]: true,
     }));
   };
 
@@ -394,25 +395,26 @@ export default function Home() {
       const currentProducts = useMockData ? MOCK_PRODUCTS : products;
 
       currentProducts.forEach((p) => {
+        const uniqueKey = `${p.brand}-${p.product_name}`;
         if (time >= p.timeline[0] && time <= p.timeline[1]) {
           // 구간 내 진입 시 수동 토글 초기화하고 자동 펼침
-          if (manualToggled[p.product_name]) {
+          if (manualToggled[uniqueKey]) {
             setManualToggled((prevManual) => ({
               ...prevManual,
-              [p.product_name]: undefined,
+              [uniqueKey]: undefined,
             }));
           }
-          if (prev[p.product_name] !== false) {
-            newState[p.product_name] = false;
+          if (prev[uniqueKey] !== false) {
+            newState[uniqueKey] = false;
             changed = true;
           }
         } else if (time > p.timeline[1]) {
-          if (manualToggled[p.product_name]) {
+          if (manualToggled[uniqueKey]) {
             // 수동 토글이 있으면 자동 동작 무시
             return;
           }
-          if (prev[p.product_name] !== true) {
-            newState[p.product_name] = true;
+          if (prev[uniqueKey] !== true) {
+            newState[uniqueKey] = true;
             changed = true;
           }
         }
@@ -504,26 +506,23 @@ export default function Home() {
             {useMockData ? 'Demo Mode' : 'API Connected'}
           </div>
 
-          {isLoadingProducts && (
-            <div className="flex items-center text-blue-600">
-              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-              Detecting Products...
-            </div>
-          )}
-
-          {isLoadingVideoDetail && (
-            <div className="flex items-center text-blue-600">
-              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-              Loading Video...
-            </div>
-          )}
-
-          {isAnalyzingVideo && (
+          {/* Show only one status based on priority */}
+          {isAnalyzingVideo ? (
             <div className="flex items-center text-purple-600">
               <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
               Analyzing Products...
             </div>
-          )}
+          ) : isLoadingVideoDetail ? (
+            <div className="flex items-center text-blue-600">
+              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
+              Loading Video...
+            </div>
+          ) : isLoadingProducts ? (
+            <div className="flex items-center text-blue-600">
+              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
+              Detecting Products...
+            </div>
+          ) : null}
         </div>
 
         <p className="text-gray-600 mb-6">
@@ -544,7 +543,9 @@ export default function Home() {
           <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
             <div className="text-center">
               <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading video...</p>
+              <p className="text-gray-600">
+                {isAnalyzingVideo ? 'Analyzing video content...' : 'Loading video...'}
+              </p>
             </div>
           </div>
         )}
