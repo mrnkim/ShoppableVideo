@@ -100,28 +100,14 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  // Calculate position for product markers
-  // This handles cases where the video player dimensions don't match the original video
+  // Calculate position for product markers using percentage-based coordinates
   const calculateMarkerPosition = (product: ProductDetection) => {
-    if (!playerContainerRef.current) return { left: '0%', top: '0%' };
-
-    // Get the actual dimensions of the player container
-    const containerRect = playerContainerRef.current.getBoundingClientRect();
-
-    // Calculate position based on the location array [x, y, width, height]
-    // Convert absolute coordinates (based on 1920x1080) to percentage
-    const x = (product.location[0] / 1920) * 100;
-    const y = (product.location[1] / 1080) * 100;
-
-    // Debug logging
-    console.log(`[DEBUG] Product: ${product.product_name}`);
-    console.log(`[DEBUG] Original location: [${product.location.join(', ')}]`);
-    console.log(`[DEBUG] Container size: ${containerRect.width}x${containerRect.height}`);
-    console.log(`[DEBUG] Calculated position: x=${x.toFixed(1)}%, y=${y.toFixed(1)}%`);
+    // location is now in percentages: [x%, y%, width%, height%]
+    const [xPercent, yPercent] = product.location;
 
     return {
-      left: `${x}%`,
-      top: `${y}%`,
+      left: `${xPercent}%`,
+      top: `${yPercent}%`,
     };
   };
 
@@ -175,24 +161,30 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
 
       {/* Product Markers Overlay */}
       <div className="absolute inset-0 pointer-events-none">
-        {visibleProducts.map(product => (
-          <button
-            key={product.product_name}
-            className="product-marker absolute w-10 h-10 rounded-full bg-primary bg-opacity-70 flex items-center justify-center cursor-pointer pointer-events-auto animate-pulse-slow transition-transform duration-300 ease-in-out"
-            style={{
-              ...calculateMarkerPosition(product),
-              transform: 'translate(-50%, -50%)'
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              onProductSelect(product);
-              setPlaying(false);
-            }}
-            aria-label={`View ${product.product_name} details`}
-          >
-            <LocalMall className="text-white" />
-          </button>
-        ))}
+        {visibleProducts.map(product => {
+          const position = calculateMarkerPosition(product);
+          return (
+            <button
+              key={product.product_name}
+              className="product-marker absolute rounded-full bg-primary bg-opacity-70 flex items-center justify-center cursor-pointer pointer-events-auto animate-pulse-slow transition-transform duration-300 ease-in-out hover:scale-110"
+              style={{
+                left: position.left,
+                top: position.top,
+                width: '32px', // Fixed width for the marker
+                height: '32px', // Fixed height for the marker
+                transform: 'translate(-50%, -50%)'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onProductSelect(product);
+                setPlaying(false);
+              }}
+              aria-label={`View ${product.product_name} details`}
+            >
+              <LocalMall className="text-white" style={{ fontSize: '16px' }} />
+            </button>
+          );
+        })}
       </div>
 
       {/* Custom Video Controls */}

@@ -9,16 +9,19 @@ export async function GET(req: Request) {
     console.log('🔍 Analyze API called');
     const { searchParams } = new URL(req.url);
     const videoId = searchParams.get("videoId");
+    const forceReanalyze = searchParams.get("forceReanalyze") === "true";
     console.log('📹 Video ID:', videoId);
+    console.log('🔄 Force reanalyze:', forceReanalyze);
+
     const prompt = `
     List all the products shown in the video with the following details:
 
 - **timeline** – Timestamp when the product appears, in the format [start_time, end_time] (in seconds).
 - **brand** – Name of the brand.
 - **product_name** – Full name of the product.
-- **location** – Provide product locations as [x, y, width, height] in pixels:
-    - **x, y**: Top-left corner coordinates (0,0 = top-left of video)
-    - **width, height**: Product bounding box dimensions
+- **location** – Provide product locations as percentages based on 1920×1080 video frame in the format [x%, y%, width%, height%]:
+    - **x%, y%**: Top-left corner coordinates as percentages (0% = top-left of video)
+    - **width%, height%**: Product bounding box dimensions as percentages
 
 - **price** – The price of the product shown or mentioned, if available.
 - **description** – Summarize what is said or implied about the product in the video (e.g., via voiceover, subtitles, or customer testimonials).
@@ -32,7 +35,7 @@ export async function GET(req: Request) {
     "timeline": [start, end],
     "brand": "brand_name",
     "product_name": "product_name",
-    "location": [x, y, width, height],
+    "location": [x%, y%, width%, height%],
     "price": "price_info",
     "description": "product_description"
   }
