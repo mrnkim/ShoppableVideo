@@ -496,10 +496,12 @@ export default function Home() {
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="lg:w-2/3">
-        <h1 className="text-2xl font-bold mb-4">Shoppable Video Experience</h1>
-
+        <h1 className="text-2xl font-bold mb-2">Shoppable Video Experience</h1>
+        <p className="mb-6">
+          Discover and purchase products directly from a video without interrupting playback
+        </p>
         {/* Video Selection Dropdown */}
-        <div className="mb-6">
+        <div className="mb-3">
           <div className="relative">
             <select
               id="video-select"
@@ -524,34 +526,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex items-center mb-6 text-sm">
-          <div className={`px-3 py-1 rounded-full mr-3 flex items-center ${useMockData ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
-            <span className="w-2 h-2 rounded-full mr-2 bg-current"></span>
-            {useMockData ? 'Demo Mode' : 'API Connected'}
-          </div>
 
-          {/* Show only one status based on priority */}
-          {isAnalyzingVideo ? (
-            <div className="flex items-center text-purple-600">
-              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-              Analyzing Products...
-            </div>
-          ) : isLoadingVideoDetail ? (
-            <div className="flex items-center text-blue-600">
-              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-              Loading Video...
-            </div>
-          ) : isLoadingProducts ? (
-            <div className="flex items-center text-blue-600">
-              <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-              Detecting Products...
-            </div>
-          ) : null}
-        </div>
-
-        <p className="text-gray-600 mb-6">
-          Discover and purchase products directly from this video without interrupting playback.
-        </p>
 
         {/* Video Player with Product Overlays */}
         {videoUrl ? (
@@ -573,46 +548,10 @@ export default function Home() {
             </div>
           </div>
         )}
-
-        {/* Video Description */}
-        {/* <div className="mt-6 p-4 bg-white rounded-lg shadow">
-          <h2 className="text-xl font-semibold">About This Video</h2>
-          <p className="text-gray-600 mt-2">
-            This demo showcases how AI-powered video understanding can transform the viewing experience
-            into a shopping opportunity. Products are detected in real-time using TwelveLabs' deep
-            semantic search capabilities, allowing viewers to discover and purchase items without
-            interrupting their viewing experience.
-          </p>
-        </div> */}
-
-        {/* Technology Explanation */}
-        {/* <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h2 className="text-lg font-semibold text-blue-800">Powered by TwelveLabs AI</h2>
-          <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white p-3 rounded shadow-sm">
-              <h3 className="font-medium text-blue-700">TwelveLabs Search API</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Enables natural language queries like "red dress in dance scene" to pinpoint products with frame accuracy.
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded shadow-sm">
-              <h3 className="font-medium text-blue-700">TwelveLabs Analyze API</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Creates tailored product descriptions using video context (e.g., "Windproof jacket shown in mountain summit scene").
-              </p>
-            </div>
-            <div className="bg-white p-3 rounded shadow-sm">
-              <h3 className="font-medium text-blue-700">TwelveLabs Embed API</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Powers "Similar Styles" recommendations by analyzing visual/textual product attributes.
-              </p>
-            </div>
-          </div>
-        </div> */}
       </div>
 
-      <div className="lg:w-1/3">
-        {/* Product Detail Sidebar */}
+      {/* Product Detail Sidebar - Aligned with video player */}
+      <div className="lg:w-1/3 lg:pt-[calc(2rem+1.5rem+1.5rem+1.5rem+1.5rem)]">
         <ProductDetailSidebar
           products={useMockData ? MOCK_PRODUCTS : products}
           collapsedProducts={collapsedProducts}
@@ -623,29 +562,6 @@ export default function Home() {
           onRelatedProductSelect={() => {}}
           currentTime={currentTime}
         />
-
-        {/* Shopping Cart */}
-        {/* <ShoppingCart
-          items={items}
-          onUpdateQuantity={updateQuantity}
-          onCheckout={handleCheckout}
-          isOpen={isCartOpen}
-          onToggle={toggleCart}
-        /> */}
-
-        {/* Additional Info */}
-        {/* {!selectedProduct && (
-          <div className="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <h3 className="font-medium text-gray-700 mb-2">How It Works</h3>
-            <ol className="list-decimal list-inside text-sm text-gray-600 space-y-2">
-              <li>Play the video to see product markers appear</li>
-              <li>Click on a product marker to view details</li>
-              <li>Add products to your cart</li>
-              <li>Explore similar product recommendations</li>
-              <li>Complete your purchase without leaving the video</li>
-            </ol>
-          </div>
-        )} */}
       </div>
     </div>
   );
