@@ -141,7 +141,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                 <div className="bg-blue-50 p-3 rounded-lg mb-4">
                   <h3 className="text-sm font-medium text-blue-800 mb-1">Appears in Video</h3>
                   <p className="text-sm text-blue-700">
-                    {Math.floor(product.timeline[0])}s - {Math.floor(product.timeline[1])}s
+                    {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
                   </p>
                 </div>
                 <button
