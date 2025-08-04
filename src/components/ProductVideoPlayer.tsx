@@ -170,8 +170,8 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
               style={{
                 left: position.left,
                 top: position.top,
-                width: '32px', // Fixed width for the marker
-                height: '32px', // Fixed height for the marker
+                width: '40px', // Fixed width for the marker
+                height: '40px', // Fixed height for the marker
                 transform: 'translate(-50%, -50%)'
               }}
               onClick={(e) => {
@@ -181,7 +181,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
               }}
               aria-label={`View ${product.product_name} details`}
             >
-              <LocalMall className="text-white" style={{ fontSize: '16px' }} />
+              <LocalMall className="text-white" style={{ fontSize: '20px' }} />
             </button>
           );
         })}
