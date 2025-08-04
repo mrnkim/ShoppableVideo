@@ -128,6 +128,7 @@ export default function Home() {
   const [isLoadingVideoDetail, setIsLoadingVideoDetail] = useState<boolean>(false);
   const [isAnalyzingVideo, setIsAnalyzingVideo] = useState<boolean>(false);
   const [videoDetail, setVideoDetail] = useState<VideoDetail | null>(null);
+  const [videoPlayer, setVideoPlayer] = useState<{ seekTo: (time: number) => void } | null>(null);
 
   // Load videos from TwelveLabs index
   const loadVideos = useCallback(async () => {
@@ -458,6 +459,18 @@ export default function Home() {
     clearCart();
   };
 
+  // Handle video player ready
+  const handlePlayerReady = useCallback((player: { seekTo: (time: number) => void }) => {
+    setVideoPlayer(player);
+  }, []);
+
+  // Handle product click to seek to timeline
+  const handleProductClick = useCallback((product: ProductDetection) => {
+    if (videoPlayer) {
+      videoPlayer.seekTo(product.timeline[0]);
+    }
+  }, [videoPlayer]);
+
   // Initialize videos when component mounts
   useEffect(() => {
     loadVideos();
@@ -537,6 +550,7 @@ export default function Home() {
             onVisibleProductsChange={handleVisibleProductsChange}
             onTimeUpdate={handleTimeUpdate}
             autoPlay={true}
+            onPlayerReady={handlePlayerReady}
           />
         ) : (
           <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
@@ -561,6 +575,7 @@ export default function Home() {
           onAddToCart={() => {}}
           onRelatedProductSelect={() => {}}
           currentTime={currentTime}
+          onProductClick={handleProductClick}
         />
       </div>
     </div>

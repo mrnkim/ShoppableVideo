@@ -26,6 +26,7 @@ interface ProductDetailSidebarProps {
   onRelatedProductSelect: (product: RelatedProduct) => void;
   isLoading?: boolean;
   currentTime?: number; // 현재 비디오 시간 추가
+  onProductClick?: (product: Product) => void; // 제품 클릭 핸들러 추가
 }
 
 const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
@@ -38,6 +39,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   onRelatedProductSelect,
   isLoading = false,
   currentTime = 0, // 현재 비디오 시간 추가
+  onProductClick,
 }) => {
   if (!products.length && !isLoading) {
     return (
@@ -116,12 +118,20 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
           <div key={reactKey} className="mb-6">
             {isCollapsed ? (
               <div className="flex items-center gap-3">
-                <div className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                  isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
-                }`}>
+                <div
+                  className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap cursor-pointer ${
+                    isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
+                  }`}
+                  onClick={() => onProductClick?.(product)}
+                >
                   {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
                 </div>
-                <span className={`text-xl font-semibold truncate flex-1 ${titleColor}`}>{product.product_name}</span>
+                <span
+                  className={`text-xl font-semibold truncate flex-1 cursor-pointer ${titleColor}`}
+                  onClick={() => onProductClick?.(product)}
+                >
+                  {product.product_name}
+                </span>
                 <button
                   className="ml-2 flex-shrink-0"
                   onClick={() => onToggleCollapse(product.product_name, product.brand, product.timeline)}
@@ -134,12 +144,20 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
               <div>
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
-                      isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
-                    }`}>
+                    <div
+                      className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap cursor-pointer ${
+                        isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
+                      }`}
+                      onClick={() => onProductClick?.(product)}
+                    >
                       {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
                     </div>
-                    <h2 className={`text-xl font-semibold truncate ${titleColor}`}>{product.product_name}</h2>
+                    <h2
+                      className={`text-xl font-semibold truncate cursor-pointer ${titleColor}`}
+                      onClick={() => onProductClick?.(product)}
+                    >
+                      {product.product_name}
+                    </h2>
                   </div>
                   <button
                     className="ml-2 flex-shrink-0"

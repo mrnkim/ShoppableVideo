@@ -12,6 +12,7 @@ interface ProductVideoPlayerProps {
   autoPlay?: boolean;
   onVisibleProductsChange?: (products: ProductDetection[]) => void;
   onTimeUpdate?: (currentTime: number) => void;
+  onPlayerReady?: (player: { seekTo: (time: number) => void }) => void;
 }
 
 const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
@@ -23,6 +24,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   autoPlay = true,
   onVisibleProductsChange,
   onTimeUpdate,
+  onPlayerReady,
 }) => {
   const [playing, setPlaying] = useState<boolean>(autoPlay);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -58,6 +60,19 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   // Handle video duration loaded
   const handleDuration = (duration: number) => {
     setDuration(duration);
+  };
+
+  // Handle video ready
+  const handleReady = () => {
+    if (onPlayerReady) {
+      onPlayerReady({
+        seekTo: (time: number) => {
+          if (playerRef.current) {
+            playerRef.current.seekTo(time);
+          }
+        }
+      });
+    }
   };
 
   // Show/hide controls when hovering over video
@@ -97,6 +112,12 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     // Convert absolute coordinates (based on 1920x1080) to percentage
     const x = (product.location[0] / 1920) * 100;
     const y = (product.location[1] / 1080) * 100;
+
+    // Debug logging
+    console.log(`[DEBUG] Product: ${product.product_name}`);
+    console.log(`[DEBUG] Original location: [${product.location.join(', ')}]`);
+    console.log(`[DEBUG] Container size: ${containerRect.width}x${containerRect.height}`);
+    console.log(`[DEBUG] Calculated position: x=${x.toFixed(1)}%, y=${y.toFixed(1)}%`);
 
     return {
       left: `${x}%`,
@@ -140,6 +161,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
         onPause={() => setPlaying(false)}
         onPlay={() => setPlaying(true)}
         onDuration={handleDuration}
+        onReady={handleReady}
         progressInterval={100} // Update progress more frequently for smoother marker updates
         config={{
           file: {
