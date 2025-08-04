@@ -2,51 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 245, 245, 245;
-  --primary-color: #9AED59;
-  --secondary-color: #444444;
-  --accent-color: #0070f3;
+/* Milling Font */
+@font-face {
+  font-family: 'Milling';
+  font-style: 'normal';
+  font-weight: 400;
+  src: url('https://d2n8i6crd2t3p1.cloudfront.net/font/milling/205TF-Milling-Duplex1mm.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'Milling';
+  font-style: 'normal';
+  font-weight: 700;
+  src: url('https://d2n8i6crd2t3p1.cloudfront.net/font/milling/205TF-Milling-Triplex1mm.woff2') format('woff2');
+}
+
+/* Apply Milling font to entire application */
 * {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+  font-family: 'Milling', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
-html,
 body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  font-family: 'Milling', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
-/* Custom scrollbar for product sidebar */
+/* Custom animation for shopping bag icon */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Product sidebar scrollbar styling */
 .product-sidebar::-webkit-scrollbar {
   width: 6px;
 }
 
 .product-sidebar::-webkit-scrollbar-track {
   background: #f1f1f1;
-  border-radius: 10px;
+  border-radius: 3px;
 }
 
 .product-sidebar::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 10px;
+  background: #c1c1c1;
+  border-radius: 3px;
 }
 
 .product-sidebar::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #a8a8a8;
 }
 
 /* Product overlay animations */

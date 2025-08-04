@@ -27,15 +27,15 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-gradient-to-b from-white to-gray-50">
         <Providers>
-          <header className="border-b border-gray-200 bg-white">
-            <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-              <div className="flex items-center space-x-2">
+          <header>
+            {/* <div className="container mx-auto px-4 py-4 flex items-center justify-between"> */}
+              {/* <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
                   <span className="text-white font-bold">SV</span>
                 </div>
                 <h1 className="text-xl font-semibold text-secondary">ShoppableVideo</h1>
-              </div>
-            </div>
+              </div> */}
+            {/* </div> */}
           </header>
           <main className="container mx-auto px-4 py-8">
             {children}
