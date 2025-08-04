@@ -25,6 +25,7 @@ interface ProductDetailSidebarProps {
   onAddToCart: (product: Product) => void;
   onRelatedProductSelect: (product: RelatedProduct) => void;
   isLoading?: boolean;
+  currentTime?: number; // 현재 비디오 시간 추가
 }
 
 const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
@@ -36,6 +37,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   onAddToCart,
   onRelatedProductSelect,
   isLoading = false,
+  currentTime = 0, // 현재 비디오 시간 추가
 }) => {
   if (!products.length && !isLoading) {
     return (
@@ -100,16 +102,26 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
       {products.map((product, index) => {
         const uniqueKey = `${product.brand}-${product.product_name}`;
         const isCollapsed = collapsedProducts[uniqueKey];
-        // Use simple index-based key for stability
         const reactKey = `product-${index}`;
+
+        // 현재 시간에 따라 제품 상태 결정
+        const isActive = currentTime >= product.timeline[0] && currentTime <= product.timeline[1];
+        const isPast = currentTime > product.timeline[1];
+
+        // 폰트 색상 결정
+        const textColor = isActive ? 'text-black' : 'text-gray-400';
+        const titleColor = isActive ? 'text-black' : 'text-gray-500';
+
         return (
           <div key={reactKey} className="mb-6">
             {isCollapsed ? (
               <div className="flex items-center gap-3">
-                <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                <div className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                  isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
+                }`}>
                   {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
                 </div>
-                <span className="text-xl font-semibold truncate flex-1">{product.product_name}</span>
+                <span className={`text-xl font-semibold truncate flex-1 ${titleColor}`}>{product.product_name}</span>
                 <button
                   className="ml-2 flex-shrink-0"
                   onClick={() => onToggleCollapse(product.product_name, product.brand)}
@@ -122,10 +134,12 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
               <div>
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap">
+                    <div className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                      isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
+                    }`}>
                       {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
                     </div>
-                    <h2 className="text-xl font-semibold truncate">{product.product_name}</h2>
+                    <h2 className={`text-xl font-semibold truncate ${titleColor}`}>{product.product_name}</h2>
                   </div>
                   <button
                     className="ml-2 flex-shrink-0"
@@ -137,21 +151,28 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                 </div>
                 <div className="mb-4">
                   <div className="mb-2">
-                    <span className="text-gray-600">Price: </span>
-                    <span className="font-semibold">{product.price}</span>
+                    <span className={`${textColor}`}>Price: </span>
+                    <span className={`font-semibold ${textColor}`}>{product.price}</span>
                   </div>
                   <div className="mb-2">
-                    <span className="text-gray-600">Brand: </span>
-                    <span>{product.brand}</span>
+                    <span className={`${textColor}`}>Brand: </span>
+                    <span className={`${textColor}`}>{product.brand}</span>
                   </div>
                 </div>
-                <p className="text-gray-700 mb-4">{product.description}</p>
+                <p className={`mb-4 ${textColor}`}>{product.description}</p>
                 <button
-                  className="w-full bg-primary hover:bg-opacity-90 text-secondary font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2"
+                  className={`w-full font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 ${
+                    isActive
+                      ? 'bg-primary hover:bg-opacity-90 text-secondary'
+                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  }`}
                   onClick={() => {
-                    const q = encodeURIComponent(`${product.brand} ${product.product_name}`);
-                    window.open(`https://www.amazon.com/s?k=${q}`, '_blank');
+                    if (isActive) {
+                      const q = encodeURIComponent(`${product.brand} ${product.product_name}`);
+                      window.open(`https://www.amazon.com/s?k=${q}`, '_blank');
+                    }
                   }}
+                  disabled={!isActive}
                 >
                   <ShoppingBag fontSize="small" />
                   Shop at Amazon

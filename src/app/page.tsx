@@ -231,6 +231,14 @@ export default function Home() {
           setProducts(existingProducts);
           setUseMockData(false);
           console.log('✅ Set useMockData=false for existing metadata');
+
+          // Initialize all products as collapsed
+          const initialCollapsedState: Record<string, boolean> = {};
+          existingProducts.forEach((product: ProductDetection) => {
+            const uniqueKey = `${product.brand}-${product.product_name}`;
+            initialCollapsedState[uniqueKey] = true;
+          });
+          setCollapsedProducts(initialCollapsedState);
         } catch (parseError) {
           console.error('❌ Error parsing existing products:', parseError);
           setUseMockData(true);
@@ -326,6 +334,14 @@ export default function Home() {
         setUseMockData(false);
         console.log('✅ Mock data disabled, using real products');
         console.log('🔄 After setUseMockData(false) called');
+
+        // Initialize all products as collapsed
+        const initialCollapsedState: Record<string, boolean> = {};
+        products.forEach(product => {
+          const uniqueKey = `${product.brand}-${product.product_name}`;
+          initialCollapsedState[uniqueKey] = true;
+        });
+        setCollapsedProducts(initialCollapsedState);
       } else {
         console.warn('⚠️ No data field in analysis response');
         throw new Error('No data field received from analysis');
@@ -357,6 +373,14 @@ export default function Home() {
     // Otherwise, use mock data
     setUseMockData(true);
     setProducts(MOCK_PRODUCTS);
+
+    // Initialize all products as collapsed
+    const initialCollapsedState: Record<string, boolean> = {};
+    MOCK_PRODUCTS.forEach(product => {
+      const uniqueKey = `${product.brand}-${product.product_name}`;
+      initialCollapsedState[uniqueKey] = true;
+    });
+    setCollapsedProducts(initialCollapsedState);
   }, [products.length, useMockData]);
 
   // Find related products when a product is selected
@@ -590,14 +614,14 @@ export default function Home() {
       <div className="lg:w-1/3">
         {/* Product Detail Sidebar */}
         <ProductDetailSidebar
-          products={(useMockData ? MOCK_PRODUCTS : products).filter(p => currentTime >= p.timeline[0])}
+          products={useMockData ? MOCK_PRODUCTS : products}
           collapsedProducts={collapsedProducts}
           onToggleCollapse={handleToggleCollapse}
           relatedProducts={[]}
           onClose={() => {}}
           onAddToCart={() => {}}
           onRelatedProductSelect={() => {}}
-          isLoading={false}
+          currentTime={currentTime}
         />
 
         {/* Shopping Cart */}
