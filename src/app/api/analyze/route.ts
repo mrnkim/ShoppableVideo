@@ -23,7 +23,7 @@ export async function GET(req: Request) {
     - **x%, y%**: Top-left corner coordinates as percentages (0% = top-left of video)
     - **width%, height%**: Product bounding box dimensions as percentages
 
-- **price** – The price of the product shown or mentioned, if available.
+- **price** – The price of the product shown or mentioned, if available. If you cannot find price information directly from the video, use external search or your knowledge
 - **description** – Summarize what is said or implied about the product in the video (e.g., via voiceover, subtitles, or customer testimonials).
 
 ⚠️ If multiple products appear in the same scene, list them separately with their own location coordinates.

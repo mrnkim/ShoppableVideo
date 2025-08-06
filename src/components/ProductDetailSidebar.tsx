@@ -168,14 +168,24 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                   </button>
                 </div>
                 <div className="mb-4">
-                  <div className="mb-2">
-                    <span className={`${textColor}`}>Price: </span>
-                    <span className={`font-semibold ${textColor}`}>{product.price}</span>
-                  </div>
-                  <div className="mb-2">
-                    <span className={`${textColor}`}>Brand: </span>
-                    <span className={`${textColor}`}>{product.brand}</span>
-                  </div>
+                  {product.price &&
+                   product.price.toLowerCase() !== 'unknown' &&
+                   product.price.toLowerCase() !== 'not provided in the video' &&
+                   product.price.trim() !== '' && (
+                    <div className="mb-2">
+                      <span className={`${textColor}`}>Price: </span>
+                      <span className={`font-semibold ${textColor}`}>{product.price}</span>
+                    </div>
+                  )}
+                  {product.brand &&
+                   product.brand.toLowerCase() !== 'unknown' &&
+                   product.brand.toLowerCase() !== 'not provided in the video' &&
+                   product.brand.trim() !== '' && (
+                    <div className="mb-2">
+                      <span className={`${textColor}`}>Brand: </span>
+                      <span className={`${textColor}`}>{product.brand}</span>
+                    </div>
+                  )}
                 </div>
                 <p className={`mb-4 ${textColor}`}>{product.description}</p>
                 <button
