@@ -1,7 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import Providers from './providers';
+
 
 // Load Inter font with Latin subset for better performance
 const inter = Inter({
@@ -26,8 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-        <Providers>
-          <header>
+        <header>
             {/* <div className="container mx-auto px-4 py-4 flex items-center justify-between"> */}
               {/* <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
@@ -47,7 +46,6 @@ export default function RootLayout({
               </div>
             </div>
           </footer>
-        </Providers>
       </body>
     </html>
   );

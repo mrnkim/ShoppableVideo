@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ProductVideoPlayer } from '@/components/ProductVideoPlayer';
 import ProductDetailSidebar from '@/components/ProductDetailSidebar';
-import ShoppingCart from '@/components/ShoppingCart';
+
 import { ProductDetection, RelatedProduct } from '@/lib/twelvelabs';
-import { useCart } from '@/contexts/CartContext';
+
 import { Info, ShoppingBag, ExpandMore } from '@mui/icons-material';
 
 // Types for video data from TwelveLabs API
@@ -105,8 +105,7 @@ const MOCK_PRODUCTS: ProductDetection[] =
 
 export default function Home() {
 
-  // Cart context
-  const { addItem, updateQuantity, items, isCartOpen, toggleCart, clearCart } = useCart();
+
 
   // State variables
   const [videoUrl, setVideoUrl] = useState<string>('');
@@ -449,16 +448,7 @@ export default function Home() {
     });
   }, [manualToggled, useMockData, products]);
 
-  // Handle related product selection
-  const handleRelatedProductSelect = (product: RelatedProduct) => {
-    addItem(product);
-  };
 
-  // Handle checkout
-  const handleCheckout = () => {
-    alert("Checkout process would be implemented here in a real application");
-    clearCart();
-  };
 
   // Handle video player ready
   const handlePlayerReady = useCallback((player: { seekTo: (time: number) => void }) => {
