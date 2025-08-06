@@ -2,52 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Refresh, PlayArrow, Settings } from '@mui/icons-material';
+import { VideoItem, VideoDetail } from '@/lib/types';
 
-interface VideoItem {
-  _id: string;
-  created_at: string;
-  system_metadata?: {
-    filename?: string;
-    duration?: number;
-    video_title?: string;
-    fps?: number;
-    height?: number;
-    width?: number;
-    size?: number;
-    model_names?: string[];
-  };
-  hls?: {
-    video_url?: string;
-    thumbnail_urls?: string[];
-    status?: string;
-    updated_at?: string;
-  };
-  user_metadata?: Record<string, unknown>;
-}
-
-interface VideoDetail {
-  _id: string;
-  index_id?: string;
-  hls?: {
-    video_url?: string;
-    thumbnail_urls?: string[];
-    status?: string;
-    updated_at?: string;
-  };
-  system_metadata?: {
-    filename?: string;
-    duration?: number;
-    video_title?: string;
-    fps?: number;
-    height?: number;
-    width?: number;
-    size?: number;
-    model_names?: string[];
-  };
-  user_metadata?: Record<string, unknown>;
-  source?: Record<string, unknown>;
-  embedding?: Record<string, unknown>;
-}
 
 export default function AdminPage() {
   const [videos, setVideos] = useState<VideoItem[]>([]);

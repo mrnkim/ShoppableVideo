@@ -1,19 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
 import { LocalMall, Pause, PlayArrow } from '@mui/icons-material';
-import { ProductDetection } from '@/lib/twelvelabs';
-
-interface ProductVideoPlayerProps {
-  videoUrl: string;
-  products: ProductDetection[];
-  onProductSelect: (product: ProductDetection) => void;
-  width?: string | number;
-  height?: string | number;
-  autoPlay?: boolean;
-  onVisibleProductsChange?: (products: ProductDetection[]) => void;
-  onTimeUpdate?: (currentTime: number) => void;
-  onPlayerReady?: (player: { seekTo: (time: number) => void }) => void;
-}
+import { ProductInfo, ProductVideoPlayerProps } from '@/lib/types';
 
 const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   videoUrl,
@@ -28,7 +16,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
 }) => {
   const [playing, setPlaying] = useState<boolean>(autoPlay);
   const [currentTime, setCurrentTime] = useState<number>(0);
-  const [visibleProducts, setVisibleProducts] = useState<ProductDetection[]>([]);
+  const [visibleProducts, setVisibleProducts] = useState<ProductInfo[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [controlsVisible, setControlsVisible] = useState<boolean>(false);
   const [duration, setDuration] = useState<number>(0);
@@ -101,7 +89,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   };
 
   // Calculate position for product markers using percentage-based coordinates
-  const calculateMarkerPosition = (product: ProductDetection) => {
+  const calculateMarkerPosition = (product: ProductInfo) => {
     // location is now in percentages: [x%, y%, width%, height%]
     const [xPercent, yPercent] = product.location;
 

@@ -1,31 +1,13 @@
 import React from 'react';
-import { Close, Info, ShoppingBag, LocalMall, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
-interface Product {
-  timeline: [number, number];
-  brand: string;
-  product_name: string;
-  location: number[];
-  price: string;
-  description: string;
-}
-
-
-
-interface ProductDetailSidebarProps {
-  products: Product[];
-  collapsedProducts: Record<string, boolean>;
-  onToggleCollapse: (productName: string, brand: string, timeline: [number, number]) => void;
-  isLoading?: boolean;
-  currentTime?: number; // 현재 비디오 시간 추가
-  onProductClick?: (product: Product) => void; // 제품 클릭 핸들러 추가
-}
+import { ShoppingBag, LocalMall, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { ProductDetailSidebarProps } from '@/lib/types';
 
 const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   products,
   collapsedProducts,
   onToggleCollapse,
   isLoading = false,
-  currentTime = 0, // 현재 비디오 시간 추가
+  currentTime = 0,
   onProductClick,
 }) => {
   if (!products.length && !isLoading) {
@@ -93,11 +75,8 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
         const isCollapsed = collapsedProducts[uniqueKey];
         const reactKey = `product-${index}`;
 
-        // 현재 시간에 따라 제품 상태 결정
         const isActive = currentTime >= product.timeline[0] && currentTime <= product.timeline[1];
-        const isPast = currentTime > product.timeline[1];
 
-        // 폰트 색상 결정
         const textColor = isActive ? 'text-black' : 'text-gray-400';
         const titleColor = isActive ? 'text-black' : 'text-gray-500';
 

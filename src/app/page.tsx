@@ -3,122 +3,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ProductVideoPlayer } from '@/components/ProductVideoPlayer';
 import ProductDetailSidebar from '@/components/ProductDetailSidebar';
-
-import { ProductDetection } from '@/lib/twelvelabs';
-
+import { ProductInfo } from '@/lib/types';
 import { Info, ShoppingBag, ExpandMore } from '@mui/icons-material';
-
-// Types for video data from TwelveLabs API
-interface VideoItem {
-  _id: string;
-  created_at: string;
-  system_metadata?: {
-    filename?: string;
-    duration?: number;
-    video_title?: string;
-    fps?: number;
-    height?: number;
-    width?: number;
-    size?: number;
-    model_names?: string[];
-  };
-  hls?: {
-    video_url?: string;
-    thumbnail_urls?: string[];
-    status?: string;
-    updated_at?: string;
-  };
-}
-
-interface VideoDetail {
-  _id: string;
-  index_id?: string;
-  hls?: {
-    video_url?: string;
-    thumbnail_urls?: string[];
-    status?: string;
-    updated_at?: string;
-  };
-  system_metadata?: {
-    filename?: string;
-    duration?: number;
-    video_title?: string;
-    fps?: number;
-    height?: number;
-    width?: number;
-    size?: number;
-    model_names?: string[];
-  };
-  user_metadata?: Record<string, unknown>;
-  source?: Record<string, unknown>;
-  embedding?: Record<string, unknown>;
-}
-
-
-
-// Mock products for demonstration when API is not available
-const MOCK_PRODUCTS: ProductDetection[] =
-[
-  {
-    "timeline": [13.0, 16.0],
-    "brand": "Jennie-O",
-    "product_name": "93% lean-7% fat fresh-ground turkey",
-    "location": [5.2, 18.5, 7.8, 9.3], // [100/1920*100, 200/1080*100, 150/1920*100, 100/1080*100]
-    "price": "Not specified",
-    "description": "The ground turkey is displayed on a countertop and its packaging label is shown, highlighting its nutritional information."
-    },
-    {
-    "timeline": [13.0, 16.0],
-    "brand": "Unknown",
-    "product_name": "Whipped Low Fat Cottage Cheese Spreadable",
-    "location": [7.8, 20.4, 5.2, 3.7], // [150/1920*100, 220/1080*100, 100/1920*100, 40/1080*100]
-    "price": "Not specified",
-    "description": "The cottage cheese is displayed on a countertop and later its nutrition facts label is focused on in a close-up shot."
-    },
-    {
-    "timeline": [13.0, 16.0],
-    "brand": "Unknown",
-    "product_name": "White eggs",
-    "location": [10.4, 22.2, 3.1, 3.7], // [200/1920*100, 240/1080*100, 60/1920*100, 40/1080*100]
-    "price": "Not specified",
-    "description": "The eggs are shown nestled within a cardboard carton and later used in the recipe."
-    },
-    {
-    "timeline": [13.0, 16.0],
-    "brand": "Unknown",
-    "product_name": "Kale leaves",
-    "location": [13.0, 24.1, 3.6, 4.6], // [250/1920*100, 260/1080*100, 70/1920*100, 50/1080*100]
-    "price": "Not specified",
-    "description": "The kale leaves are displayed on a countertop and later added to the skillet with the ground turkey mixture."
-    },
-    {
-    "timeline": [216.0, 224.0],
-    "brand": "Unknown",
-    "product_name": "Flat piece of dough",
-    "location": [15.6, 25.9, 5.2, 4.6], // [300/1920*100, 280/1080*100, 100/1920*100, 50/1080*100]
-    "price": "Not specified",
-    "description": "The dough is shown resting on parchment paper next to a rolling pin, indicating it is part of the burrito-making process."
-    }
-]
-
-
+import { VideoItem, VideoDetail } from '@/lib/types';
+import { MOCK_PRODUCTS } from '@/lib/mockdata';
 
 export default function Home() {
-
-
-
-  // State variables
   const [videoUrl, setVideoUrl] = useState<string>('');
-  const [products, setProducts] = useState<ProductDetection[]>([]);
-  const [visibleProducts, setVisibleProducts] = useState<ProductDetection[]>([]);
+  const [products, setProducts] = useState<ProductInfo[]>([]);
+  const [visibleProducts, setVisibleProducts] = useState<ProductInfo[]>([]);
   const [collapsedProducts, setCollapsedProducts] = useState<Record<string, boolean>>({});
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [isLoadingRelated, setIsLoadingRelated] = useState<boolean>(false);
   const [useMockData, setUseMockData] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [manualToggled, setManualToggled] = useState<Record<string, boolean | undefined>>({});
-
-  const [selectedProduct, setSelectedProduct] = useState<ProductDetection | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductInfo | null>(null);
 
   // New state for video management
   const [videos, setVideos] = useState<VideoItem[]>([]);
@@ -234,7 +134,7 @@ export default function Home() {
 
           // Initialize all products as collapsed
           const initialCollapsedState: Record<string, boolean> = {};
-          existingProducts.forEach((product: ProductDetection) => {
+          existingProducts.forEach((product: ProductInfo) => {
             const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
             initialCollapsedState[uniqueKey] = true;
           });
@@ -387,11 +287,11 @@ export default function Home() {
 
 
   // Handle product selection
-  const handleProductSelect = useCallback((product: ProductDetection) => {
+  const handleProductSelect = useCallback((product: ProductInfo) => {
     setSelectedProduct(product);
   }, []);
 
-  const handleVisibleProductsChange = useCallback((products: ProductDetection[]) => {
+  const handleVisibleProductsChange = useCallback((products: ProductInfo[]) => {
     setVisibleProducts(products);
   }, []);
 
@@ -451,7 +351,7 @@ export default function Home() {
   }, []);
 
   // Handle product click to seek to timeline
-  const handleProductClick = useCallback((product: ProductDetection) => {
+  const handleProductClick = useCallback((product: ProductInfo) => {
     if (videoPlayer) {
       videoPlayer.seekTo(product.timeline[0]);
     }
