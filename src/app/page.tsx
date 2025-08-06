@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ProductVideoPlayer } from '@/components/ProductVideoPlayer';
 import ProductDetailSidebar from '@/components/ProductDetailSidebar';
 
-import { ProductDetection, RelatedProduct } from '@/lib/twelvelabs';
+import { ProductDetection } from '@/lib/twelvelabs';
 
 import { Info, ShoppingBag, ExpandMore } from '@mui/icons-material';
 
@@ -117,7 +117,7 @@ export default function Home() {
   const [useMockData, setUseMockData] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [manualToggled, setManualToggled] = useState<Record<string, boolean | undefined>>({});
-  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
+
   const [selectedProduct, setSelectedProduct] = useState<ProductDetection | null>(null);
 
   // New state for video management
@@ -384,17 +384,12 @@ export default function Home() {
     setCollapsedProducts(initialCollapsedState);
   }, [products.length, useMockData]);
 
-  // Find related products when a product is selected
-  const handleFindRelatedProducts = useCallback(async (product: ProductDetection) => {
-    // For now, set empty array since we're not using related products
-    setRelatedProducts([]);
-  }, []);
+
 
   // Handle product selection
   const handleProductSelect = useCallback((product: ProductDetection) => {
     setSelectedProduct(product);
-    handleFindRelatedProducts(product);
-  }, [handleFindRelatedProducts]);
+  }, []);
 
   const handleVisibleProductsChange = useCallback((products: ProductDetection[]) => {
     setVisibleProducts(products);
@@ -561,10 +556,6 @@ export default function Home() {
           products={useMockData ? MOCK_PRODUCTS : products}
           collapsedProducts={collapsedProducts}
           onToggleCollapse={handleToggleCollapse}
-          relatedProducts={[]}
-          onClose={() => {}}
-          onAddToCart={() => {}}
-          onRelatedProductSelect={() => {}}
           currentTime={currentTime}
           onProductClick={handleProductClick}
         />

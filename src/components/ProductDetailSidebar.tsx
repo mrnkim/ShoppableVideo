@@ -9,21 +9,12 @@ interface Product {
   description: string;
 }
 
-interface RelatedProduct {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-}
+
 
 interface ProductDetailSidebarProps {
   products: Product[];
   collapsedProducts: Record<string, boolean>;
   onToggleCollapse: (productName: string, brand: string, timeline: [number, number]) => void;
-  relatedProducts: RelatedProduct[];
-  onClose: () => void;
-  onAddToCart: (product: Product) => void;
-  onRelatedProductSelect: (product: RelatedProduct) => void;
   isLoading?: boolean;
   currentTime?: number; // 현재 비디오 시간 추가
   onProductClick?: (product: Product) => void; // 제품 클릭 핸들러 추가
@@ -33,10 +24,6 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   products,
   collapsedProducts,
   onToggleCollapse,
-  relatedProducts,
-  onClose,
-  onAddToCart,
-  onRelatedProductSelect,
   isLoading = false,
   currentTime = 0, // 현재 비디오 시간 추가
   onProductClick,
