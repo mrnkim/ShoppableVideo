@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
-import { LocalMall, Pause, PlayArrow } from '@mui/icons-material';
+import { LocalMall, Pause, PlayArrow, VolumeUp, VolumeOff } from '@mui/icons-material';
 import { ProductInfo, ProductVideoPlayerProps } from '@/lib/types';
 
 const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
@@ -15,6 +15,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   onPlayerReady,
 }) => {
   const [playing, setPlaying] = useState<boolean>(autoPlay);
+  const [muted, setMuted] = useState<boolean>(true); // Start muted for autoplay compatibility
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [visibleProducts, setVisibleProducts] = useState<ProductInfo[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -43,6 +44,11 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   // Handle play/pause toggle
   const togglePlayPause = () => {
     setPlaying(!playing);
+  };
+
+  // Handle mute/unmute toggle
+  const toggleMute = () => {
+    setMuted(!muted);
   };
 
   // Handle video duration loaded
@@ -130,6 +136,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
         width={width}
         height={height}
         playing={playing}
+        muted={muted} // Start muted for autoplay compatibility
         controls={false} // We're using custom controls
         onProgress={handleProgress}
         onPause={() => setPlaying(false)}
@@ -201,6 +208,13 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
               aria-label={playing ? 'Pause' : 'Play'}
             >
               {playing ? <Pause fontSize="small" className="text-white" /> : <PlayArrow fontSize="small" className="text-white" />}
+            </button>
+            <button
+              onClick={toggleMute}
+              className="w-8 h-8 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full transition-colors"
+              aria-label={muted ? 'Unmute' : 'Mute'}
+            >
+              {muted ? <VolumeOff fontSize="small" className="text-white" /> : <VolumeUp fontSize="small" className="text-white" />}
             </button>
             <span className="text-white text-sm">
               {formatTime(currentTime)} / {formatTime(duration)}
