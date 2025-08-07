@@ -75,6 +75,15 @@ export default function Home() {
     }
 
     setIsLoadingVideoDetail(true);
+
+    // Clear previous video's product data when loading new video detail
+    setProducts([]);
+    setVisibleProducts([]);
+    setCollapsedProducts({});
+    setSelectedProduct(null);
+    setManualToggled({});
+    setCurrentTime(0);
+    setIsAnalyzingVideo(false);
     try {
       console.log('🎬 Loading video detail for videoId:', videoId);
       const response = await fetch(`/api/videos/${videoId}?indexId=${defaultIndexId}`);
@@ -260,6 +269,20 @@ export default function Home() {
 
   // Handle video selection
   const handleVideoSelect = useCallback((videoId: string) => {
+    console.log('🎬 Video selection changed to:', videoId);
+
+    // Clear previous video's product data
+    setProducts([]);
+    setVisibleProducts([]);
+    setCollapsedProducts({});
+    setSelectedProduct(null);
+    setManualToggled({});
+    setCurrentTime(0);
+
+    // Reset analysis state
+    setIsAnalyzingVideo(false);
+
+    // Update selected video and load details
     setSelectedVideoId(videoId);
     loadVideoDetail(videoId);
   }, [loadVideoDetail]);
@@ -457,6 +480,7 @@ export default function Home() {
           collapsedProducts={collapsedProducts}
           manualToggled={manualToggled}
           onToggleCollapse={handleToggleCollapse}
+          isLoading={isAnalyzingVideo}
           currentTime={currentTime}
           onProductClick={handleProductClick}
         />

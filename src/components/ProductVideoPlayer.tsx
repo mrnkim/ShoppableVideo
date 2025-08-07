@@ -24,6 +24,18 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   const playerRef = useRef<ReactPlayer>(null);
   const playerContainerRef = useRef<HTMLDivElement>(null);
 
+  // Reset product states when video URL changes
+  useEffect(() => {
+    console.log('Video URL changed, resetting states');
+    setCurrentTime(0);
+    setVisibleProducts([]);
+    setPlaying(autoPlay);
+    setMuted(true); // Always start muted for autoplay compatibility
+    if (onVisibleProductsChange) {
+      onVisibleProductsChange([]);
+    }
+  }, [videoUrl, autoPlay, onVisibleProductsChange]);
+
   // Update current time and visible products
   const handleProgress = (state: { playedSeconds: number }) => {
     setCurrentTime(state.playedSeconds);
@@ -41,14 +53,47 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     setVisibleProducts(productsToShow);
   };
 
-  // Handle play/pause toggle
+    // Handle play/pause toggle
   const togglePlayPause = () => {
-    setPlaying(!playing);
+    const newPlayingState = !playing;
+    console.log('Toggle play/pause:', { current: playing, new: newPlayingState, muted });
+    
+    if (newPlayingState) {
+      // Trying to play
+      if (!muted) {
+        // If trying to play unmuted, mute first for autoplay compatibility
+        console.log('Attempting to play unmuted video, muting first');
+        setMuted(true);
+        setPlaying(true);
+      } else {
+        // Already muted, just play
+        setPlaying(true);
+      }
+    } else {
+      // Pausing - just pause
+      setPlaying(false);
+    }
   };
 
-  // Handle mute/unmute toggle
+    // Handle mute/unmute toggle
   const toggleMute = () => {
-    setMuted(!muted);
+    const newMutedState = !muted;
+    console.log('Toggle mute:', { current: muted, new: newMutedState, playing });
+    
+    if (newMutedState) {
+      // Muting - just change mute state
+      setMuted(true);
+    } else {
+      // Unmuting - need to handle autoplay policy
+      if (!playing) {
+        // If video is not playing, start it muted first, then unmute
+        setMuted(false);
+        setPlaying(true);
+      } else {
+        // If video is already playing, just unmute
+        setMuted(false);
+      }
+    }
   };
 
   // Handle video duration loaded
@@ -137,10 +182,20 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
         height={height}
         playing={playing}
         muted={muted} // Start muted for autoplay compatibility
+        volume={muted ? 0 : 1} // Ensure volume is 0 when muted
         controls={false} // We're using custom controls
         onProgress={handleProgress}
-        onPause={() => setPlaying(false)}
-        onPlay={() => setPlaying(true)}
+        onPause={() => {
+          console.log('Video paused by browser');
+          setPlaying(false);
+        }}
+        onPlay={() => {
+          console.log('Video playing by browser');
+          setPlaying(true);
+        }}
+        onError={(error) => {
+          console.error('Video player error:', error);
+        }}
         onDuration={handleDuration}
         onReady={handleReady}
         progressInterval={100} // Update progress more frequently for smoother marker updates
@@ -149,6 +204,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
             attributes: {
               crossOrigin: "anonymous",
               controlsList: "nodownload",
+              playsInline: true,
             },
           },
         }}

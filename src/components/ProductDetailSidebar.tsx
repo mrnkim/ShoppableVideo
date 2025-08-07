@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ShoppingBag, LocalMall, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { ProductDetailSidebarProps } from '@/lib/types';
 
@@ -11,6 +11,13 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   currentTime = 0,
   onProductClick,
 }) => {
+  // Reset manual toggled state when products change
+  useEffect(() => {
+    if (products.length === 0) {
+      // Clear manual toggled state when products are cleared
+      // This will be handled by the parent component
+    }
+  }, [products.length]);
   if (!products.length && !isLoading) {
     return (
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6 text-center h-full">
@@ -27,43 +34,10 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6 h-full">
-        <div className="animate-pulse">
-          <div className="flex justify-between items-start mb-4">
-            <div className="h-7 bg-gray-200 rounded w-3/4"></div>
-            <div className="w-6 h-6 bg-gray-200 rounded-full"></div>
-          </div>
-
-          <div className="bg-gray-200 h-48 rounded mb-4"></div>
-
-          <div className="mb-4 space-y-2">
-            <div className="flex justify-between mb-2">
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            </div>
-            <div className="flex justify-between mb-2">
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-            </div>
-          </div>
-
-          <div className="h-20 bg-gray-200 rounded mb-4"></div>
-
-          <div className="bg-blue-50 p-3 rounded-lg mb-4">
-            <div className="h-4 bg-blue-100 rounded w-3/4 mb-2"></div>
-            <div className="h-12 bg-blue-100 rounded"></div>
-          </div>
-
-          <div className="h-10 bg-gray-200 rounded mb-6"></div>
-
-          <div className="mt-6">
-            <div className="h-6 bg-gray-200 rounded w-1/3 mb-3"></div>
-            <div className="grid grid-cols-2 gap-3">
-              {[1, 2, 3, 4].map(i => (
-                <div key={i} className="bg-gray-200 h-32 rounded"></div>
-              ))}
-            </div>
-          </div>
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6 h-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Analyzing video content...</p>
         </div>
       </div>
     );
