@@ -142,6 +142,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                    product.price.toLowerCase() !== 'not available' &&
                    product.price.toLowerCase() !== 'none' &&
                    product.price.toLowerCase() !== 'none visible' &&
+                   product.price.toLowerCase() !== 'not explicitly visible' &&
                    product.price.trim() !== '' && (
                     <div className="mb-2">
                       <span className={`${textColor}`}>Price: </span>
@@ -157,6 +158,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                    product.brand.toLowerCase() !== 'none' &&
                    product.brand.toLowerCase() !== 'none visible' &&
                    product.brand.toLowerCase() !== 'unbranded' &&
+                   product.brand.toLowerCase() !== 'not explicitly visible' &&
                    product.brand.trim() !== '' && (
                     <div className="mb-2">
                       <span className={`${textColor}`}>Brand: </span>
@@ -173,7 +175,34 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                   }`}
                   onClick={() => {
                     if (isActive) {
-                      const q = encodeURIComponent(`${product.brand} ${product.product_name}`);
+                      // Define filtered brand terms that should not be included in search
+                      const filteredBrandTerms = [
+                        'unknown',
+                        'not provided in the video',
+                        'not specified',
+                        'not mentioned in the video',
+                        'not available',
+                        'none',
+                        'none visible',
+                        'unbranded',
+                        'not explicitly visible'
+                      ];
+
+                      // Check if brand should be filtered out
+                      const shouldFilterBrand = product.brand &&
+                        filteredBrandTerms.includes(product.brand.toLowerCase().trim());
+
+                      // Create search query
+                      let searchQuery;
+                      if (shouldFilterBrand) {
+                        // Use only product name if brand is filtered
+                        searchQuery = product.product_name;
+                      } else {
+                        // Use brand + product name if brand is valid
+                        searchQuery = `${product.brand} ${product.product_name}`;
+                      }
+
+                      const q = encodeURIComponent(searchQuery);
                       window.open(`https://www.amazon.com/s?k=${q}`, '_blank');
                     }
                   }}
