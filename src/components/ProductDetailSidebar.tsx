@@ -5,6 +5,7 @@ import { ProductDetailSidebarProps } from '@/lib/types';
 const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   products,
   collapsedProducts,
+  manualToggled,
   onToggleCollapse,
   isLoading = false,
   currentTime = 0,
@@ -76,6 +77,8 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
         const reactKey = `product-${index}`;
 
         const isActive = currentTime >= product.timeline[0] && currentTime <= product.timeline[1];
+        const isManuallyToggled = manualToggled[uniqueKey];
+        const shouldEnableShopButton = isActive || isManuallyToggled;
 
         const textColor = isActive ? 'text-black' : 'text-gray-400';
         const titleColor = isActive ? 'text-black' : 'text-gray-500';
@@ -169,12 +172,12 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                 <p className={`mb-4 ${textColor}`}>{product.description}</p>
                 <button
                   className={`w-full font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 ${
-                    isActive
+                    shouldEnableShopButton
                       ? 'bg-primary hover:bg-opacity-90 text-secondary'
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   }`}
                   onClick={() => {
-                    if (isActive) {
+                    if (shouldEnableShopButton) {
                       // Define filtered brand terms that should not be included in search
                       const filteredBrandTerms = [
                         'unknown',
@@ -206,7 +209,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                       window.open(`https://www.amazon.com/s?k=${q}`, '_blank');
                     }
                   }}
-                  disabled={!isActive}
+                  disabled={!shouldEnableShopButton}
                 >
                   <ShoppingBag fontSize="small" />
                   Shop at Amazon

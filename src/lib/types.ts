@@ -60,6 +60,7 @@ export interface VideoDetail {
 export interface ProductDetailSidebarProps {
   products: ProductInfo[];
   collapsedProducts: Record<string, boolean>;
+  manualToggled: Record<string, boolean | undefined>;
   onToggleCollapse: (productName: string, brand: string, timeline: [number, number]) => void;
   isLoading?: boolean;
   currentTime?: number;

@@ -455,6 +455,7 @@ export default function Home() {
         <ProductDetailSidebar
           products={useMockData ? MOCK_PRODUCTS : products}
           collapsedProducts={collapsedProducts}
+          manualToggled={manualToggled}
           onToggleCollapse={handleToggleCollapse}
           currentTime={currentTime}
           onProductClick={handleProductClick}
