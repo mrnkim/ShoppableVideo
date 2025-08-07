@@ -8,6 +8,8 @@ import { VideoItem, VideoDetail } from '@/lib/types';
 export default function AdminPage() {
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [videoDetails, setVideoDetails] = useState<Record<string, VideoDetail>>({});
+  const [analyzeResponses, setAnalyzeResponses] = useState<Record<string, any>>({});
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [isLoadingVideos, setIsLoadingVideos] = useState<boolean>(false);
   const [isLoadingDetails, setIsLoadingDetails] = useState<boolean>(false);
   const [analyzingVideos, setAnalyzingVideos] = useState<Set<string>>(new Set());
@@ -89,6 +91,12 @@ export default function AdminPage() {
 
       const analyzeData = await analyzeResponse.json();
       console.log('📊 Reanalysis result:', analyzeData);
+
+      // Store the analyze response for display
+      setAnalyzeResponses(prev => ({
+        ...prev,
+        [videoId]: analyzeData
+      }));
 
       // Extract products from the analysis response
       if (analyzeData.data) {
@@ -189,6 +197,22 @@ export default function AdminPage() {
     return 0;
   };
 
+  const toggleRowExpansion = (videoId: string) => {
+    setExpandedRows(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(videoId)) {
+        newSet.delete(videoId);
+      } else {
+        newSet.add(videoId);
+      }
+      return newSet;
+    });
+  };
+
+  const hasAnalyzeResponse = (videoId: string) => {
+    return analyzeResponses[videoId] !== undefined;
+  };
+
   // Load videos on component mount
   useEffect(() => {
     loadVideos();
@@ -258,6 +282,9 @@ export default function AdminPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Details
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -266,7 +293,7 @@ export default function AdminPage() {
                     const productCount = getProductCount(video._id);
                     const isAnalyzing = analyzingVideos.has(video._id);
 
-                    return (
+                    return [
                       <tr key={video._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -326,8 +353,32 @@ export default function AdminPage() {
                             )}
                           </button>
                         </td>
-                      </tr>
-                    );
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          {hasAnalyzeResponse(video._id) && (
+                            <button
+                              onClick={() => toggleRowExpansion(video._id)}
+                              className="flex items-center px-3 py-1 rounded-md text-sm bg-green-600 text-white hover:bg-green-700"
+                            >
+                              {expandedRows.has(video._id) ? 'Hide' : 'Show'} Response
+                            </button>
+                          )}
+                        </td>
+                      </tr>,
+                      ...(expandedRows.has(video._id) && hasAnalyzeResponse(video._id) ? [
+                        <tr key={`${video._id}-expanded`}>
+                          <td colSpan={6} className="px-6 py-4 bg-gray-50">
+                            <div className="bg-white border rounded-lg p-4">
+                              <h4 className="font-semibold text-gray-900 mb-3">Analyze API Response</h4>
+                              <div className="bg-gray-100 rounded p-3 overflow-auto max-h-96">
+                                <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                                  {JSON.stringify(analyzeResponses[video._id], null, 2)}
+                                </pre>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      ] : [])
+                    ];
                   })}
                 </tbody>
               </table>
