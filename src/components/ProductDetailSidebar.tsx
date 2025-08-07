@@ -137,6 +137,11 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                   {product.price &&
                    product.price.toLowerCase() !== 'unknown' &&
                    product.price.toLowerCase() !== 'not provided in the video' &&
+                   product.price.toLowerCase() !== 'not specified' &&
+                   product.price.toLowerCase() !== 'not mentioned in the video' &&
+                   product.price.toLowerCase() !== 'not available' &&
+                   product.price.toLowerCase() !== 'none' &&
+                   product.price.toLowerCase() !== 'none visible' &&
                    product.price.trim() !== '' && (
                     <div className="mb-2">
                       <span className={`${textColor}`}>Price: </span>
@@ -146,6 +151,12 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                   {product.brand &&
                    product.brand.toLowerCase() !== 'unknown' &&
                    product.brand.toLowerCase() !== 'not provided in the video' &&
+                   product.brand.toLowerCase() !== 'not specified' &&
+                   product.brand.toLowerCase() !== 'not mentioned in the video' &&
+                   product.brand.toLowerCase() !== 'not available' &&
+                   product.brand.toLowerCase() !== 'none' &&
+                   product.brand.toLowerCase() !== 'none visible' &&
+                   product.brand.toLowerCase() !== 'unbranded' &&
                    product.brand.trim() !== '' && (
                     <div className="mb-2">
                       <span className={`${textColor}`}>Brand: </span>
