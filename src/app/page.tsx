@@ -6,7 +6,7 @@ import ProductDetailSidebar from '@/components/ProductDetailSidebar';
 import { ProductInfo } from '@/lib/types';
 import { Info, ShoppingBag, ExpandMore } from '@mui/icons-material';
 import { VideoItem, VideoDetail } from '@/lib/types';
-import { MOCK_PRODUCTS } from '@/lib/mockdata';
+
 
 export default function Home() {
   const [videoUrl, setVideoUrl] = useState<string>('');
@@ -15,7 +15,6 @@ export default function Home() {
   const [collapsedProducts, setCollapsedProducts] = useState<Record<string, boolean>>({});
   const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
   const [isLoadingRelated, setIsLoadingRelated] = useState<boolean>(false);
-  const [useMockData, setUseMockData] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [manualToggled, setManualToggled] = useState<Record<string, boolean | undefined>>({});
   const [selectedProduct, setSelectedProduct] = useState<ProductInfo | null>(null);
@@ -34,8 +33,6 @@ export default function Home() {
     const defaultIndexId = process.env.NEXT_PUBLIC_DEFAULT_INDEX_ID;
     if (!defaultIndexId) {
       console.error('Default index ID not configured');
-      setUseMockData(true);
-      setVideoUrl('/breakfast_burrito.mp4');
       return;
     }
 
@@ -52,16 +49,11 @@ export default function Home() {
       // Select the most recent video by default (first in the list since API returns newest first)
       if (data.data && data.data.length > 0) {
         setSelectedVideoId(data.data[0]._id);
-      } else {
-        // No videos found, use mock data
-        setUseMockData(true);
-        setVideoUrl('/breakfast_burrito.mp4');
       }
+      // No videos found - just show empty state
     } catch (error) {
       console.error('Error loading videos:', error);
-      console.log('🔄 Setting useMockData=true due to video loading error');
-      setUseMockData(true);
-      setVideoUrl('/breakfast_burrito.mp4');
+      // No fallback - just show empty state
     } finally {
       setIsLoadingVideos(false);
     }
@@ -103,18 +95,16 @@ export default function Home() {
       if (data.hls?.video_url) {
         console.log('🎥 Setting HLS video URL:', data.hls.video_url);
         setVideoUrl(data.hls.video_url);
-        console.log('🎥 HLS URL set, keeping useMockData as is');
+        console.log('🎥 HLS URL set');
       } else {
-        // If no HLS URL available, use mock video
-        console.log('🎥 No HLS URL, using mock video');
-        setVideoUrl('/breakfast_burrito.mp4');
-        setUseMockData(true);
-        console.warn('No HLS video URL available for this video, using mock video');
+        // If no HLS URL available, show error
+        console.log('🎥 No HLS URL available');
+        setVideoUrl('');
+        console.warn('No HLS video URL available for this video');
       }
     } catch (error) {
       console.error('❌ Error loading video detail:', error);
-      setVideoUrl('/breakfast_burrito.mp4');
-      setUseMockData(true);
+      setVideoUrl('');
     } finally {
       setIsLoadingVideoDetail(false);
     }
@@ -138,8 +128,7 @@ export default function Home() {
 
           console.log('📦 Using existing products from metadata:', existingProducts);
           setProducts(existingProducts);
-          setUseMockData(false);
-          console.log('✅ Set useMockData=false for existing metadata');
+          console.log('✅ Using existing metadata');
 
           // Initialize all products as collapsed
           const initialCollapsedState: Record<string, boolean> = {};
@@ -150,7 +139,7 @@ export default function Home() {
           setCollapsedProducts(initialCollapsedState);
         } catch (parseError) {
           console.error('❌ Error parsing existing products:', parseError);
-          setUseMockData(true);
+          setProducts([]);
         }
       }
       return;
@@ -239,11 +228,9 @@ export default function Home() {
 
         // Update local state with the generated products
         console.log('🔄 Updating local state with generated products:', products);
-        console.log('🔄 Before: useMockData =', useMockData);
+        console.log('🔄 Setting products');
         setProducts(products);
-        setUseMockData(false);
-        console.log('✅ Mock data disabled, using real products');
-        console.log('🔄 After setUseMockData(false) called');
+        console.log('✅ Using real products');
 
         // Initialize all products as collapsed
         const initialCollapsedState: Record<string, boolean> = {};
@@ -258,10 +245,9 @@ export default function Home() {
       }
     } catch (error) {
       console.error('❌ Error generating metadata:', error);
-      // Fallback to mock data
-      console.log('🔄 Falling back to mock data');
-      setUseMockData(true);
-      setProducts(MOCK_PRODUCTS);
+      // No fallback - just show empty state
+      console.log('🔄 No fallback data available');
+      setProducts([]);
     } finally {
       setIsAnalyzingVideo(false);
     }
@@ -290,22 +276,14 @@ export default function Home() {
   // Detect products in the video
   const handleDetectProducts = useCallback(async () => {
     // If we already have products from metadata analysis, use them
-    if (products.length > 0 && !useMockData) {
+    if (products.length > 0) {
       return;
     }
 
-    // Otherwise, use mock data
-    setUseMockData(true);
-    setProducts(MOCK_PRODUCTS);
-
-    // Initialize all products as collapsed
-    const initialCollapsedState: Record<string, boolean> = {};
-    MOCK_PRODUCTS.forEach(product => {
-      const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
-      initialCollapsedState[uniqueKey] = true;
-    });
-    setCollapsedProducts(initialCollapsedState);
-  }, [products.length, useMockData]);
+    // No products available - just show empty state
+    setProducts([]);
+    setCollapsedProducts({});
+  }, [products.length]);
 
 
 
@@ -335,7 +313,7 @@ export default function Home() {
     setCollapsedProducts((prev) => {
       let changed = false;
       const newState = { ...prev };
-      const currentProducts = useMockData ? MOCK_PRODUCTS : products;
+      const currentProducts = products;
 
       currentProducts.forEach((p) => {
         const uniqueKey = `${p.brand}-${p.product_name}-${p.timeline[0]}-${p.timeline[1]}`;
@@ -364,7 +342,7 @@ export default function Home() {
       });
       return changed ? newState : prev;
     });
-  }, [manualToggled, useMockData, products]);
+  }, [manualToggled, products]);
 
 
 
@@ -403,10 +381,7 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [handleDetectProducts]);
 
-  // Debug useEffect to track useMockData changes
-  useEffect(() => {
-    console.log('🔍 useMockData changed to:', useMockData);
-  }, [useMockData]);
+
 
   // Get display name for video
   const getVideoDisplayName = (video: VideoItem) => {
@@ -454,7 +429,7 @@ export default function Home() {
         {videoUrl ? (
           <ProductVideoPlayer
             videoUrl={videoUrl}
-            products={useMockData ? MOCK_PRODUCTS : products}
+            products={products}
             onProductSelect={handleProductSelect}
             onVisibleProductsChange={handleVisibleProductsChange}
             onTimeUpdate={handleTimeUpdate}
@@ -476,7 +451,7 @@ export default function Home() {
       {/* Product Detail Sidebar - Aligned with video player */}
       <div className="lg:w-1/3 lg:pt-[calc(2rem+1.5rem+1.5rem+1.5rem+1.5rem)]">
         <ProductDetailSidebar
-          products={useMockData ? MOCK_PRODUCTS : products}
+          products={products}
           collapsedProducts={collapsedProducts}
           manualToggled={manualToggled}
           onToggleCollapse={handleToggleCollapse}
