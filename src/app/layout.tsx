@@ -39,9 +39,9 @@ export default function RootLayout({
           <main className="container mx-auto px-4 py-8">
             {children}
           </main>
-          <footer className="border-t border-gray-200 bg-white mt-auto">
+          <footer className="mt-auto">
             <div className="container mx-auto px-4 py-6">
-              <div className="text-center text-sm text-gray-500">
+              <div className="text-center text-xs text-gray-500">
                 <p>© {new Date().getFullYear()} ShoppableVideo Demo - Powered by TwelveLabs AI</p>
               </div>
             </div>
