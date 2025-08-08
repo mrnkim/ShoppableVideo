@@ -18,6 +18,7 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [manualToggled, setManualToggled] = useState<Record<string, boolean | undefined>>({});
   const [selectedProduct, setSelectedProduct] = useState<ProductInfo | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   // New state for video management
   const [videos, setVideos] = useState<VideoItem[]>([]);
@@ -400,27 +401,52 @@ export default function Home() {
         </p>
         {/* Video Selection Dropdown */}
         <div className="mb-6">
-          <div className="relative max-w">
-            <select
-              id="video-select"
-              value={selectedVideoId}
-              onChange={(e) => handleVideoSelect(e.target.value)}
+          <div className="relative w-full mx-auto rounded-lg">
+            {/* Dropdown button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
               disabled={isLoadingVideos}
-              className="w-full h-15 px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:cursor-not-allowed appearance-none cursor-pointer"
+              className={`cursor-pointer w-full text-left rounded-3xl py-3 px-5 font-sans text-black text-lg relative ${
+                selectedVideoId ? 'bg-zinc-100 border-2 border-black' : 'bg-zinc-100'
+              }`}
             >
-              {isLoadingVideos ? (
-                <option value="">Loading videos...</option>
-              ) : videos.length === 0 ? (
-                <option value="">No videos available</option>
-              ) : (
-                videos.map((video) => (
-                  <option key={video._id} value={video._id}>
-                    {getVideoDisplayName(video)}
-                  </option>
-                ))
-              )}
-            </select>
-            <ExpandMore className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <div className="flex justify-between items-center">
+                <div className="truncate pr-8">
+                  {isLoadingVideos ? "Loading videos..." :
+                   videos.length === 0 ? "No videos available" :
+                   selectedVideoId ? getVideoDisplayName(videos.find(v => v._id === selectedVideoId)!) : "Select a video"}
+                </div>
+                <div className="text-lg transform transition-transform duration-200" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                  &#x2303;
+                </div>
+              </div>
+            </button>
+
+            {/* Dropdown content */}
+            {isOpen && (
+              <div
+                className="absolute left-0 right-0 mt-1 max-h-[40vh] overflow-y-auto bg-white rounded-xl z-50 p-2"
+                style={{
+                  width: '100%',
+                  top: '100%'
+                }}
+              >
+                {videos.map((video) => (
+                  <button
+                    key={video._id}
+                    className={`cursor-pointer rounded-2xl text-left py-2 px-4 hover:bg-gray-100 last:border-0 font-sans w-full ${video._id === selectedVideoId ? 'bg-gray-200' : ''}`}
+                    onClick={() => {
+                      handleVideoSelect(video._id);
+                      setIsOpen(false);
+                    }}
+                  >
+                    <div className="text-md truncate">
+                      {getVideoDisplayName(video)}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -470,7 +496,7 @@ export default function Home() {
       </div>
 
       {/* How it works section - full width */}
-      <div className="p-6 bg-zinc-100 rounded-[45.60px]">
+      <div className="p-6 bg-gray-200 rounded-[45.60px]">
         <h2 className="text-lg font-semibold mb-2">💡 How it works</h2>
                 <div className="text-sm leading-relaxed">
           <p>1. This app loads videos from a TwelveLabs Index and uses the TwelveLabs Analyze API to extract detailed product information.</p>

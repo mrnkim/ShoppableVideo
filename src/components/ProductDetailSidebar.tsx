@@ -63,7 +63,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
               <div className="flex items-center gap-3">
                 <div
                   className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap cursor-pointer ${
-                    isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
+                    isActive ? 'bg-blue-100 text-blue-800 border border-black' : 'bg-gray-100 text-gray-500'
                   }`}
                   onClick={() => onProductClick?.(product)}
                 >
@@ -87,12 +87,12 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
               <div>
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div
-                      className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap cursor-pointer ${
-                        isActive ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-500'
-                      }`}
-                      onClick={() => onProductClick?.(product)}
-                    >
+                                    <div
+                  className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap cursor-pointer ${
+                    isActive ? 'bg-blue-100 text-blue-800 border border-black' : 'bg-gray-100 text-gray-500'
+                  }`}
+                  onClick={() => onProductClick?.(product)}
+                >
                       {Math.floor(product.timeline[0] / 60)}:{(Math.floor(product.timeline[0]) % 60).toString().padStart(2, '0')} - {Math.floor(product.timeline[1] / 60)}:{(Math.floor(product.timeline[1]) % 60).toString().padStart(2, '0')}
                     </div>
                     <h2

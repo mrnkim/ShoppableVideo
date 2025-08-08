@@ -57,7 +57,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   const togglePlayPause = () => {
     const newPlayingState = !playing;
     console.log('Toggle play/pause:', { current: playing, new: newPlayingState, muted });
-    
+
     if (newPlayingState) {
       // Trying to play
       if (!muted) {
@@ -79,7 +79,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   const toggleMute = () => {
     const newMutedState = !muted;
     console.log('Toggle mute:', { current: muted, new: newMutedState, playing });
-    
+
     if (newMutedState) {
       // Muting - just change mute state
       setMuted(true);
@@ -217,7 +217,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
           return (
             <button
               key={product.product_name}
-              className="product-marker absolute rounded-full bg-primary bg-opacity-70 flex items-center justify-center cursor-pointer pointer-events-auto animate-pulse-slow transition-transform duration-300 ease-in-out hover:scale-110"
+              className="product-marker absolute rounded-full bg-black bg-opacity-70 flex items-center justify-center cursor-pointer pointer-events-auto animate-pulse-slow transition-transform duration-300 ease-in-out hover:scale-110"
               style={{
                 left: position.left,
                 top: position.top,
@@ -248,7 +248,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
           onClick={handleProgressBarClick}
         >
           <div
-            className="h-full bg-primary rounded-full relative"
+            className="h-full bg-white rounded-full relative"
             style={{ width: `${(currentTime / duration) * 100}%` }}
           >
             <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-white rounded-full"></div>

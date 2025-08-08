@@ -25,23 +25,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <body className="min-h-screen bg-zinc-100">
         <header>
-            {/* <div className="container mx-auto px-4 py-4 flex items-center justify-between"> */}
-              {/* <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-                  <span className="text-white font-bold">SV</span>
-                </div>
-                <h1 className="text-xl font-semibold text-secondary">ShoppableVideo</h1>
-              </div> */}
-            {/* </div> */}
+
           </header>
           <main className="container mx-auto px-4 py-8">
             {children}
           </main>
           <footer className="mt-auto">
             <div className="container mx-auto px-4 py-6">
-              <div className="text-center text-xs text-gray-500">
+              <div className="text-center text-xs">
                 <p>© {new Date().getFullYear()} ShoppableVideo Demo - Powered by TwelveLabs AI</p>
               </div>
             </div>
