@@ -36,7 +36,7 @@ export default function RootLayout({
               </div> */}
             {/* </div> */}
           </header>
-          <main className="container mx-auto px-4 py-8">
+          <main className="container mx-auto px-4 py-8 mb-10">
             {children}
           </main>
           <footer className="mt-auto">

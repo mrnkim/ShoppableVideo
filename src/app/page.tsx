@@ -391,15 +391,16 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6">
-      <div className="lg:w-2/3">
+    <div className="flex flex-col gap-6">
+      {/* Header section - full width */}
+      <div>
         <h1 className="text-2xl font-bold mb-2">Shoppable Video Experience</h1>
         <p className="mb-6">
           Discover and purchase products directly from a video without interrupting playback
         </p>
         {/* Video Selection Dropdown */}
-        <div className="mb-3">
-          <div className="relative">
+        <div className="mb-6">
+          <div className="relative max-w">
             <select
               id="video-select"
               value={selectedVideoId}
@@ -422,43 +423,61 @@ export default function Home() {
             <ExpandMore className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
         </div>
-
-
-
-        {/* Video Player with Product Overlays */}
-        {videoUrl ? (
-          <ProductVideoPlayer
-            videoUrl={videoUrl}
-            products={products}
-            onProductSelect={handleProductSelect}
-            onVisibleProductsChange={handleVisibleProductsChange}
-            onTimeUpdate={handleTimeUpdate}
-            autoPlay={true}
-            onPlayerReady={handlePlayerReady}
-          />
-        ) : (
-          <div className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center">
-            <div className="text-center">
-              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600">
-                {isAnalyzingVideo ? 'Analyzing video content...' : 'Loading video...'}
-              </p>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Product Detail Sidebar - Aligned with video player */}
-      <div className="lg:w-1/3 lg:pt-[calc(2rem+1.5rem+1.5rem+1.5rem+1.5rem)]">
-        <ProductDetailSidebar
-          products={products}
-          collapsedProducts={collapsedProducts}
-          manualToggled={manualToggled}
-          onToggleCollapse={handleToggleCollapse}
-          isLoading={isAnalyzingVideo}
-          currentTime={currentTime}
-          onProductClick={handleProductClick}
-        />
+      {/* Video and Sidebar container */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Video Player */}
+        <div className="lg:w-2/3">
+          {videoUrl ? (
+            <div className="">
+              <ProductVideoPlayer
+                videoUrl={videoUrl}
+                products={products}
+                onProductSelect={handleProductSelect}
+                onVisibleProductsChange={handleVisibleProductsChange}
+                onTimeUpdate={handleTimeUpdate}
+                autoPlay={true}
+                onPlayerReady={handlePlayerReady}
+              />
+            </div>
+          ) : (
+            <div className="w-full  bg-gray-100 rounded-lg flex items-center justify-center">
+              <div className="text-center">
+                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-600">
+                  {isAnalyzingVideo ? 'Analyzing video content...' : 'Loading video...'}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Product Detail Sidebar */}
+        <div className="lg:w-1/3">
+          <div className="h-[350px]">
+            <ProductDetailSidebar
+              products={products}
+              collapsedProducts={collapsedProducts}
+              manualToggled={manualToggled}
+              onToggleCollapse={handleToggleCollapse}
+              isLoading={isAnalyzingVideo}
+              currentTime={currentTime}
+              onProductClick={handleProductClick}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* How it works section - full width */}
+      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <h2 className="text-lg font-semibold text-blue-800 mb-2">How it works</h2>
+        <p className="text-sm text-blue-700 leading-relaxed">
+          This app loads videos from a TwelveLabs Index and uses the TwelveLabs Analyze API to extract product information.
+          The Analyze API detects all products appearing in the video, describes how they are presented, identifies their
+          on-screen locations, and provides brand and pricing information when available. Product details are displayed
+          in the sidebar with timestamps showing when each item appears in the video.
+        </p>
       </div>
     </div>
   );
