@@ -406,7 +406,7 @@ export default function Home() {
               value={selectedVideoId}
               onChange={(e) => handleVideoSelect(e.target.value)}
               disabled={isLoadingVideos}
-              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed appearance-none"
+              className="w-full h-15 px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 disabled:bg-gray-100 disabled:cursor-not-allowed appearance-none cursor-pointer"
             >
               {isLoadingVideos ? (
                 <option value="">Loading videos...</option>
@@ -442,7 +442,7 @@ export default function Home() {
               />
             </div>
           ) : (
-            <div className="w-full  bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="w-full rounded-lg flex items-center justify-center">
               <div className="text-center">
                 <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
                 <p className="text-gray-600">
@@ -470,14 +470,13 @@ export default function Home() {
       </div>
 
       {/* How it works section - full width */}
-      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-        <h2 className="text-lg font-semibold text-blue-800 mb-2">How it works</h2>
-        <p className="text-sm text-blue-700 leading-relaxed">
-          This app loads videos from a TwelveLabs Index and uses the TwelveLabs Analyze API to extract product information.
-          The Analyze API detects all products appearing in the video, describes how they are presented, identifies their
-          on-screen locations, and provides brand and pricing information when available. Product details are displayed
-          in the sidebar with timestamps showing when each item appears in the video.
-        </p>
+      <div className="p-6 bg-zinc-100 rounded-[45.60px]">
+        <h2 className="text-lg font-semibold mb-2">💡 How it works</h2>
+                <div className="text-sm leading-relaxed">
+          <p>1. This app loads videos from a TwelveLabs Index and uses the TwelveLabs Analyze API to extract detailed product information.</p>
+          <p>2. The API detects every product appearing in a video, describes how each one is presented, pinpoints its on-screen location, and includes brand and pricing information when available.</p>
+          <p>3. Product details are then displayed in a sidebar, along with timestamps indicating when each item appears.</p>
+        </div>
       </div>
     </div>
   );
