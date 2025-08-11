@@ -25,19 +25,20 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
           <ShoppingBag className="text-gray-400" />
         </div>
         <h2 className="text-xl font-semibold mb-2">Discover Products</h2>
-        <p className="text-gray-600">
-          Click on product markers in the video to view details.
-        </p>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6 h-full flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Analyzing video content...</p>
+      <div className="bg-white rounded-lg shadow-lg p-6 mb-6 text-center h-full">
+        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <ShoppingBag className="text-gray-400" />
+        </div>
+        <h2 className="text-xl font-semibold mb-4">Discover Products</h2>
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-gray-600">Loading products...</p>
         </div>
       </div>
     );

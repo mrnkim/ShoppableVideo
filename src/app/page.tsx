@@ -76,7 +76,7 @@ export default function Home() {
     setSelectedProduct(null);
     setManualToggled({});
     setCurrentTime(0);
-    setIsAnalyzingVideo(false);
+    setIsAnalyzingVideo(true); // Start with analyzing state
     try {
       console.log('🎬 Loading video detail for videoId:', videoId);
       const response = await fetch(`/api/videos/${videoId}?indexId=${defaultIndexId}`);
@@ -143,6 +143,7 @@ export default function Home() {
           setProducts([]);
         }
       }
+      setIsAnalyzingVideo(false); // Stop analyzing when using existing metadata
       return;
     }
 
