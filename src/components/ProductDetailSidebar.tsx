@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ShoppingBag, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { ProductDetailSidebarProps } from '@/lib/types';
 
@@ -11,6 +11,9 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   currentTime = 0,
   onProductClick,
 }) => {
+  const productRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const sidebarRef = useRef<HTMLDivElement | null>(null);
+
   // Reset manual toggled state when products change
   useEffect(() => {
     if (products.length === 0) {
@@ -18,6 +21,28 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
       // This will be handled by the parent component
     }
   }, [products.length]);
+
+  // Auto-scroll to active product when currentTime changes
+  useEffect(() => {
+    if (products.length === 0) return;
+
+    const activeProduct = products.find(product =>
+      currentTime >= product.timeline[0] && currentTime <= product.timeline[1]
+    );
+
+    if (activeProduct && sidebarRef.current) {
+      const uniqueKey = `${activeProduct.brand}-${activeProduct.product_name}-${activeProduct.timeline[0]}-${activeProduct.timeline[1]}`;
+      const productElement = productRefs.current[uniqueKey];
+
+      if (productElement) {
+        productElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest'
+        });
+      }
+    }
+  }, [currentTime, products]);
   if (!products.length && !isLoading) {
     return (
       <div className="bg-white rounded-[45.06px] p-6 mb-6 text-center h-full">
@@ -45,7 +70,10 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   }
 
   return (
-    <div className="bg-white rounded-[45.06px] p-4 mb-6 overflow-y-auto max-h-[calc(100vh-360px)] product-sidebar">
+    <div
+      ref={sidebarRef}
+      className="bg-white rounded-[45.06px] p-4 mb-6 overflow-y-auto max-h-[calc(100vh-360px)] product-sidebar"
+    >
       {products.map((product, index) => {
         const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
         const isCollapsed = collapsedProducts[uniqueKey];
@@ -59,7 +87,13 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
         const titleColor = isActive ? 'text-black' : 'text-gray-500';
 
         return (
-          <div key={reactKey} className="mb-6">
+          <div
+            key={reactKey}
+            className="mb-6"
+            ref={(el) => {
+              productRefs.current[uniqueKey] = el;
+            }}
+          >
             {isCollapsed ? (
               <div className="flex items-center gap-3">
                 <div
