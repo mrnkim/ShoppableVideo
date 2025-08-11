@@ -52,7 +52,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
 
         const isActive = currentTime >= product.timeline[0] && currentTime <= product.timeline[1];
         const isManuallyToggled = manualToggled[uniqueKey];
-        const shouldEnableShopButton = isActive || isManuallyToggled;
+        const shouldEnableShopButton = isActive;
 
         const textColor = isActive ? 'text-black' : 'text-gray-400';
         const titleColor = isActive ? 'text-black' : 'text-gray-500';
@@ -147,7 +147,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                 <button
                   className={`w-full font-medium py-2 px-4 rounded transition-colors flex items-center justify-center gap-2 ${
                     shouldEnableShopButton
-                      ? 'bg-primary hover:bg-opacity-90 text-secondary'
+                      ? 'bg-black hover:bg-opacity-90 text-white'
                       : 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   }`}
                   onClick={() => {
