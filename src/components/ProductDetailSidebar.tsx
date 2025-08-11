@@ -76,8 +76,13 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                   {product.product_name}
                 </span>
                 <button
-                  className="ml-2 flex-shrink-0"
-                  onClick={() => onToggleCollapse(product.product_name, product.brand, product.timeline)}
+                  className={`ml-2 flex-shrink-0 ${isActive ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-gray-800'}`}
+                  onClick={() => {
+                    if (!isActive) {
+                      onToggleCollapse(product.product_name, product.brand, product.timeline);
+                    }
+                  }}
+                  disabled={isActive}
                   aria-label="펼치기"
                 >
                   <KeyboardArrowDown />
@@ -103,8 +108,13 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                     </h2>
                   </div>
                   <button
-                    className="ml-2 flex-shrink-0"
-                    onClick={() => onToggleCollapse(product.product_name, product.brand, product.timeline)}
+                    className={`ml-2 flex-shrink-0 ${isActive ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-gray-800'}`}
+                    onClick={() => {
+                      if (!isActive) {
+                        onToggleCollapse(product.product_name, product.brand, product.timeline);
+                      }
+                    }}
+                    disabled={isActive}
                     aria-label="접기"
                   >
                     <KeyboardArrowUp />
