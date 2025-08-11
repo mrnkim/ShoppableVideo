@@ -20,7 +20,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   }, [products.length]);
   if (!products.length && !isLoading) {
     return (
-      <div className="bg-white rounded-[45.06px] shadow-lg p-6 mb-6 text-center h-full">
+      <div className="bg-white rounded-[45.06px] p-6 mb-6 text-center h-full">
         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <ShoppingBag className="text-gray-400" />
         </div>
@@ -31,7 +31,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-[45.06px] shadow-lg p-6 mb-6 text-center h-full">
+      <div className="bg-white rounded-[45.06px] p-6 mb-6 text-center h-full">
         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <ShoppingBag className="text-gray-400" />
         </div>
@@ -45,7 +45,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   }
 
   return (
-    <div className="bg-white rounded-[45.06px] shadow-lg p-4 mb-6 overflow-y-auto max-h-[calc(100vh-360px)] product-sidebar">
+    <div className="bg-white rounded-[45.06px] p-4 mb-6 overflow-y-auto max-h-[calc(100vh-360px)] product-sidebar">
       {products.map((product, index) => {
         const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
         const isCollapsed = collapsedProducts[uniqueKey];

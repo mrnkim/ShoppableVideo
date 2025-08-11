@@ -170,7 +170,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
 
   return (
     <div
-      className="video-container relative overflow-hidden shadow-lg"
+      className="video-container relative overflow-hidden"
       ref={playerContainerRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
