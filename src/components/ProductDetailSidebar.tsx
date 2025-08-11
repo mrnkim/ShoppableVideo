@@ -20,7 +20,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   }, [products.length]);
   if (!products.length && !isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6 text-center h-full">
+      <div className="bg-white rounded-[45.06px] shadow-lg p-6 mb-6 text-center h-full">
         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <ShoppingBag className="text-gray-400" />
         </div>
@@ -31,7 +31,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
 
   if (isLoading) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6 text-center h-full">
+      <div className="bg-white rounded-[45.06px] shadow-lg p-6 mb-6 text-center h-full">
         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <ShoppingBag className="text-gray-400" />
         </div>
@@ -73,6 +73,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                 <span
                   className={`text-xl font-semibold truncate flex-1 cursor-pointer ${titleColor}`}
                   onClick={() => onProductClick?.(product)}
+                  title={product.product_name}
                 >
                   {product.product_name}
                 </span>
@@ -104,6 +105,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
                     <h2
                       className={`text-xl font-semibold truncate cursor-pointer ${titleColor}`}
                       onClick={() => onProductClick?.(product)}
+                      title={product.product_name}
                     >
                       {product.product_name}
                     </h2>
