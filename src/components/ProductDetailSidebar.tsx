@@ -44,7 +44,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 mb-6 overflow-y-auto max-h-[calc(100vh-350px)] product-sidebar">
+    <div className="bg-white rounded-[45.06px] shadow-lg p-4 mb-6 overflow-y-auto max-h-[calc(100vh-360px)] product-sidebar">
       {products.map((product, index) => {
         const uniqueKey = `${product.brand}-${product.product_name}-${product.timeline[0]}-${product.timeline[1]}`;
         const isCollapsed = collapsedProducts[uniqueKey];

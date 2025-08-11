@@ -170,7 +170,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
 
   return (
     <div
-      className="video-container relative rounded-lg overflow-hidden shadow-lg bg-black"
+      className="video-container relative overflow-hidden shadow-lg"
       ref={playerContainerRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -292,8 +292,4 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
 };
 
 export default ProductVideoPlayer;
-// Provide a named export so consumers can import either:
-//   import ProductVideoPlayer from '...'
-// or
-//   import { ProductVideoPlayer } from '...'
 export { ProductVideoPlayer };
