@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactPlayer from 'react-player';
-import { LocalMall, Pause, PlayArrow, VolumeUp, VolumeOff } from '@mui/icons-material';
+import { ShoppingBag, Pause, PlayArrow, VolumeUp, VolumeOff } from '@mui/icons-material';
 import { ProductInfo, ProductVideoPlayerProps } from '@/lib/types';
 
 const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
@@ -232,7 +232,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
               }}
               aria-label={`View ${product.product_name} details`}
             >
-              <LocalMall className="text-white" style={{ fontSize: '20px' }} />
+              <ShoppingBag className="text-white" style={{ fontSize: '20px' }} />
             </button>
           );
         })}
@@ -280,7 +280,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
           <div className="text-white text-sm">
             {visibleProducts.length > 0 && (
               <span className="flex items-center">
-                <LocalMall fontSize="small" className="mr-1" />
+                <ShoppingBag fontSize="small" className="mr-1" />
                 {visibleProducts.length} product{visibleProducts.length !== 1 ? 's' : ''} available
               </span>
             )}

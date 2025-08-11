@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { ShoppingBag, LocalMall, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
+import { ShoppingBag, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { ProductDetailSidebarProps } from '@/lib/types';
 
 const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
@@ -22,7 +22,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
     return (
       <div className="bg-white rounded-lg shadow-lg p-6 mb-6 text-center h-full">
         <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <LocalMall className="text-gray-400" />
+          <ShoppingBag className="text-gray-400" />
         </div>
         <h2 className="text-xl font-semibold mb-2">Discover Products</h2>
         <p className="text-gray-600">
