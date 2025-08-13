@@ -78,7 +78,6 @@ export default function Home() {
     setCurrentTime(0);
     setIsAnalyzingVideo(true); // Start with analyzing state
     try {
-      console.log('🎬 Loading video detail for videoId:', videoId);
       const response = await fetch(`/api/videos/${videoId}?indexId=${defaultIndexId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch video detail: ${response.statusText}`);
@@ -86,20 +85,15 @@ export default function Home() {
 
       const data = await response.json();
       setVideoDetail(data);
-      console.log('📹 Video detail loaded:', data);
 
       // Check if custom metadata exists and generate if needed BEFORE setting video URL
-      console.log('🔍 Checking metadata before setting video URL...');
       await checkAndGenerateMetadata(videoId, defaultIndexId, data);
 
       // Set video URL from HLS data if available (AFTER metadata check)
       if (data.hls?.video_url) {
-        console.log('🎥 Setting HLS video URL:', data.hls.video_url);
         setVideoUrl(data.hls.video_url);
-        console.log('🎥 HLS URL set');
       } else {
         // If no HLS URL available, show error
-        console.log('🎥 No HLS URL available');
         setVideoUrl('');
         console.warn('No HLS video URL available for this video');
       }
@@ -115,7 +109,6 @@ export default function Home() {
   const checkAndGenerateMetadata = useCallback(async (videoId: string, indexId: string, videoData: VideoDetail, forceReanalyze = false) => {
     // Check if custom metadata already exists (unless forceReanalyze is true)
     if (!forceReanalyze && videoData.user_metadata && Object.keys(videoData.user_metadata).length > 0) {
-      console.log('✅ Custom metadata already exists for this video:', videoData.user_metadata);
       // Use existing metadata
       if (videoData.user_metadata.products) {
         let existingProducts;
@@ -127,9 +120,7 @@ export default function Home() {
             existingProducts = videoData.user_metadata.products;
           }
 
-          console.log('📦 Using existing products from metadata:', existingProducts);
           setProducts(existingProducts);
-          console.log('✅ Using existing metadata');
 
           // Initialize all products as collapsed
           const initialCollapsedState: Record<string, boolean> = {};
@@ -147,14 +138,11 @@ export default function Home() {
       return;
     }
 
-    console.log('🔍 No custom metadata found or force reanalyze requested, generating product analysis...');
     setIsAnalyzingVideo(true);
 
     try {
       // Call analyze API to generate product information
-      console.log('📡 Calling analyze API for videoId:', videoId);
       const analyzeResponse = await fetch(`/api/analyze?videoId=${videoId}${forceReanalyze ? '&forceReanalyze=true' : ''}`);
-      console.log('📡 Analyze API response status:', analyzeResponse.status);
 
       if (!analyzeResponse.ok) {
         const errorText = await analyzeResponse.text();
@@ -163,11 +151,9 @@ export default function Home() {
       }
 
       const analyzeData = await analyzeResponse.json();
-      console.log('📊 Analysis result:', analyzeData);
 
       // Extract products from the analysis response
       if (analyzeData.data) {
-        console.log('📄 Raw data string:', analyzeData.data);
 
                 // Parse the response data
         let products = [];
@@ -176,17 +162,14 @@ export default function Home() {
 
           // Check if it's still wrapped in markdown code blocks (fallback)
           if (jsonString.includes('```json')) {
-            console.log('🔧 Detected markdown formatting, cleaning...');
             jsonString = jsonString
               .replace(/```json\n?/g, '')  // Remove opening ```json
               .replace(/```\n?/g, '')      // Remove closing ```
               .trim();                     // Remove extra whitespace
           }
 
-          console.log('🔧 JSON string to parse:', jsonString);
 
           products = JSON.parse(jsonString);
-          console.log('📦 Parsed products:', products);
 
           if (!Array.isArray(products)) {
             throw new Error('Parsed data is not an array');
@@ -197,7 +180,6 @@ export default function Home() {
         }
 
         // Save the generated metadata
-        console.log('💾 Saving metadata to TwelveLabs...');
         const saveRequestBody = {
           videoId: videoId,
           indexId: indexId,
@@ -207,7 +189,6 @@ export default function Home() {
             reanalyzed: forceReanalyze
           }
         };
-        console.log('💾 Save request body:', saveRequestBody);
 
         const saveResponse = await fetch('/api/videos/saveMetadata', {
           method: 'PUT',
@@ -217,7 +198,6 @@ export default function Home() {
           body: JSON.stringify(saveRequestBody)
         });
 
-        console.log('💾 Save API response status:', saveResponse.status);
 
         if (!saveResponse.ok) {
           const errorText = await saveResponse.text();
@@ -226,13 +206,9 @@ export default function Home() {
         }
 
         const saveResult = await saveResponse.json();
-        console.log('✅ Metadata saved successfully:', saveResult);
 
         // Update local state with the generated products
-        console.log('🔄 Updating local state with generated products:', products);
-        console.log('🔄 Setting products');
         setProducts(products);
-        console.log('✅ Using real products');
 
         // Initialize all products as collapsed
         const initialCollapsedState: Record<string, boolean> = {};
@@ -248,7 +224,6 @@ export default function Home() {
     } catch (error) {
       console.error('❌ Error generating metadata:', error);
       // No fallback - just show empty state
-      console.log('🔄 No fallback data available');
       setProducts([]);
     } finally {
       setIsAnalyzingVideo(false);
@@ -257,7 +232,6 @@ export default function Home() {
 
   // Handle video selection
   const handleVideoSelect = useCallback((videoId: string) => {
-    console.log('🎬 Video selection changed to:', videoId);
 
     // Clear previous video's product data
     setProducts([]);

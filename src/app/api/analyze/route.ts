@@ -6,12 +6,9 @@ const TWELVELABS_API_BASE_URL = process.env.TWELVELABS_API_BASE_URL;
 export const maxDuration = 60;
 
 export async function GET(req: Request) {
-    console.log('🔍 Analyze API called');
     const { searchParams } = new URL(req.url);
     const videoId = searchParams.get("videoId");
     const forceReanalyze = searchParams.get("forceReanalyze") === "true";
-    console.log('📹 Video ID:', videoId);
-    console.log('🔄 Force reanalyze:', forceReanalyze);
 
     const prompt = `
     List all the products shown in the video with the following details:
@@ -59,14 +56,12 @@ export async function GET(req: Request) {
     }
 
     const url = `${TWELVELABS_API_BASE_URL}/generate`;
-    console.log('🌐 TwelveLabs Generate API URL:', url);
 
     const requestBody = {
         prompt: prompt,
         video_id: videoId,
         stream: false
     };
-    console.log('📤 Request body:', requestBody);
 
     const options = {
         method: "POST",
@@ -78,9 +73,7 @@ export async function GET(req: Request) {
     };
 
     try {
-      console.log('📡 Calling TwelveLabs Generate API...');
       const response = await fetch(url, options);
-      console.log('📡 TwelveLabs API response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -94,14 +87,12 @@ export async function GET(req: Request) {
       }
 
       const responseText = await response.text();
-      console.log('📄 Raw response text length:', responseText.length);
 
       if (!responseText) {
         throw new Error("Empty response from API");
       }
 
       const data = JSON.parse(responseText);
-      console.log('📊 Parsed response data:', data);
 
       // Return the complete data object instead of just data.data
       return NextResponse.json(data, { status: 200 });

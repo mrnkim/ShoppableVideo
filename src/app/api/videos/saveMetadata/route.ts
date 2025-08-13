@@ -21,13 +21,11 @@ interface MetadataUpdateRequest {
 
 export async function PUT(request: NextRequest) {
   try {
-    console.log('💾 SaveMetadata API called');
 
     // Parse request body
     const body: MetadataUpdateRequest = await request.json();
     const { videoId, indexId, metadata } = body;
 
-    console.log('📋 Request body:', { videoId, indexId, metadata });
 
     // Validate required parameters
     if (!videoId || !indexId) {
@@ -41,7 +39,6 @@ export async function PUT(request: NextRequest) {
     // Development/test environment response
     if (!API_KEY || !TWELVELABS_API_BASE_URL) {
       console.error('❌ Missing API key or base URL in environment variables');
-      console.log('🔧 Returning development mode response');
       return NextResponse.json({
         success: true,
         message: 'Metadata updated successfully (development mode)'
@@ -50,7 +47,6 @@ export async function PUT(request: NextRequest) {
 
     // Prepare API request
     const url = `${TWELVELABS_API_BASE_URL}/indexes/${indexId}/videos/${videoId}`;
-    console.log('🌐 TwelveLabs API URL:', url);
 
     // Convert metadata to individual user_metadata fields
     const userMetadata: Record<string, string | number | boolean> = {};
@@ -68,7 +64,6 @@ export async function PUT(request: NextRequest) {
     const requestBody = {
       user_metadata: userMetadata
     };
-    console.log('📤 Request body for TwelveLabs API:', requestBody);
 
     const options = {
       method: 'PUT',
@@ -79,10 +74,8 @@ export async function PUT(request: NextRequest) {
       body: JSON.stringify(requestBody)
     };
 
-    console.log('📡 Calling TwelveLabs API...');
     // Call Twelve Labs API
     const response = await fetch(url, options);
-    console.log('📡 TwelveLabs API response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -95,7 +88,6 @@ export async function PUT(request: NextRequest) {
 
     // For 204 No Content response, don't try to parse JSON
     if (response.status === 204) {
-      console.log('✅ TwelveLabs API: Video metadata updated successfully (204 No Content)');
       return NextResponse.json({
         success: true,
         message: 'Video metadata updated successfully'
@@ -105,14 +97,12 @@ export async function PUT(request: NextRequest) {
     // For other success responses, try to parse JSON
     try {
       const responseData = await response.json();
-      console.log('✅ TwelveLabs API response:', responseData);
       return NextResponse.json({
         success: true,
         message: 'Video metadata updated successfully',
         data: responseData
       });
     } catch (parseError) {
-      console.log('✅ TwelveLabs API: Video metadata updated successfully (no response body)');
       return NextResponse.json({
         success: true,
         message: 'Video metadata updated successfully'
