@@ -213,6 +213,12 @@ export default function AdminPage() {
     return analyzeResponses[videoId] !== undefined;
   };
 
+  // Check if video has products in metadata
+  const hasProductsData = (videoId: string) => {
+    const detail = videoDetails[videoId];
+    return detail?.user_metadata?.products !== undefined;
+  };
+
   // Load videos on component mount
   useEffect(() => {
     loadVideos();
@@ -228,8 +234,8 @@ export default function AdminPage() {
   }, [videos, videoDetails, isLoadingDetails]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-w-90% min-h-screen bg-gray-50 py-8">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -334,10 +340,10 @@ export default function AdminPage() {
                           <button
                             onClick={() => reanalyzeVideo(video._id)}
                             disabled={isAnalyzing}
-                            className={`flex items-center px-3 py-1 rounded-md text-sm ${
+                            className={`flex items-center px-3 py-1 rounded-md text-sm border transition-colors ${
                               isAnalyzing
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-blue-600 text-white hover:bg-blue-700'
+                                ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                                : 'bg-black text-white border-black hover:bg-gray-800 hover:border-gray-800'
                             }`}
                           >
                             {isAnalyzing ? (
@@ -354,26 +360,50 @@ export default function AdminPage() {
                           </button>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          {hasAnalyzeResponse(video._id) && (
+                          {hasProductsData(video._id) || hasAnalyzeResponse(video._id) ? (
                             <button
                               onClick={() => toggleRowExpansion(video._id)}
-                              className="flex items-center px-3 py-1 rounded-md text-sm bg-green-600 text-white hover:bg-green-700"
+                              className="flex items-center px-3 py-1 rounded-md text-sm border bg-black text-white border-black hover:bg-gray-800 hover:border-gray-800 transition-colors"
                             >
-                              {expandedRows.has(video._id) ? 'Hide' : 'Show'} Response
+                              {expandedRows.has(video._id) ? 'Hide' : 'Show'} {hasAnalyzeResponse(video._id) ? 'Response' : 'Products'}
                             </button>
+                          ) : (
+                            <span className="text-gray-400 text-sm">No data yet</span>
                           )}
                         </td>
                       </tr>,
-                      ...(expandedRows.has(video._id) && hasAnalyzeResponse(video._id) ? [
+                      ...(expandedRows.has(video._id) && (hasAnalyzeResponse(video._id) || hasProductsData(video._id)) ? [
                         <tr key={`${video._id}-expanded`}>
                           <td colSpan={6} className="px-6 py-4 bg-gray-50">
                             <div className="bg-white border rounded-lg p-4">
-                              <h4 className="font-semibold text-gray-900 mb-3">Analyze API Response</h4>
-                              <div className="bg-gray-100 rounded p-3 overflow-auto max-h-96">
-                                <pre className="text-sm text-gray-800 whitespace-pre-wrap">
-                                  {JSON.stringify(analyzeResponses[video._id], null, 2)}
-                                </pre>
-                              </div>
+                              {hasAnalyzeResponse(video._id) ? (
+                                <>
+                                  <h4 className="font-semibold text-gray-900 mb-3">Analyze API Response</h4>
+                                  <div className="bg-gray-100 rounded p-3 overflow-auto max-h-96">
+                                    <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                                      {JSON.stringify(analyzeResponses[video._id], null, 2)}
+                                    </pre>
+                                  </div>
+                                </>
+                              ) : hasProductsData(video._id) ? (
+                                <>
+                                  <h4 className="font-semibold text-gray-900 mb-3">Products Data</h4>
+                                  <div className="bg-gray-100 rounded p-3 overflow-auto max-h-96">
+                                    <pre className="text-sm text-gray-800 whitespace-pre-wrap">
+                                      {(() => {
+                                        try {
+                                          const products = videoDetails[video._id]?.user_metadata?.products;
+                                          if (!products) return 'No products data';
+                                          const parsed = typeof products === 'string' ? JSON.parse(products) : products;
+                                          return JSON.stringify(parsed, null, 2);
+                                        } catch (e) {
+                                          return String(videoDetails[video._id]?.user_metadata?.products || 'Invalid data');
+                                        }
+                                      })() as string}
+                                    </pre>
+                                  </div>
+                                </>
+                              ) : null}
                             </div>
                           </td>
                         </tr>
