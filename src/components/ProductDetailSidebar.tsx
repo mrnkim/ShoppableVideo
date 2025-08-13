@@ -13,6 +13,23 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
 }) => {
   const productRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const sidebarRef = useRef<HTMLDivElement | null>(null);
+  const isUserScrollingRef = useRef<boolean>(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Handle user scroll detection
+  const handleScroll = () => {
+    isUserScrollingRef.current = true;
+
+    // Clear previous timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    // Reset user scrolling flag after 2 seconds of no scrolling
+    scrollTimeoutRef.current = setTimeout(() => {
+      isUserScrollingRef.current = false;
+    }, 2000);
+  };
 
   // Reset manual toggled state when products change
   useEffect(() => {
@@ -22,9 +39,23 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
     }
   }, [products.length]);
 
-  // Auto-scroll to active product when currentTime changes
+  // Add scroll listener
   useEffect(() => {
-    if (products.length === 0) return;
+    const sidebar = sidebarRef.current;
+    if (sidebar) {
+      sidebar.addEventListener('scroll', handleScroll, { passive: true });
+      return () => {
+        sidebar.removeEventListener('scroll', handleScroll);
+        if (scrollTimeoutRef.current) {
+          clearTimeout(scrollTimeoutRef.current);
+        }
+      };
+    }
+  }, []);
+
+  // Auto-scroll to active product when currentTime changes (only if user is not scrolling)
+  useEffect(() => {
+    if (products.length === 0 || isUserScrollingRef.current) return;
 
     const activeProduct = products.find(product =>
       currentTime >= product.timeline[0] && currentTime <= product.timeline[1]
