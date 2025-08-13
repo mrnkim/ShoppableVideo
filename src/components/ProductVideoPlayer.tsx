@@ -26,7 +26,6 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
 
   // Reset product states when video URL changes
   useEffect(() => {
-    console.log('Video URL changed, resetting states');
     setCurrentTime(0);
     setVisibleProducts([]);
     setPlaying(autoPlay);
@@ -56,13 +55,11 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     // Handle play/pause toggle
   const togglePlayPause = () => {
     const newPlayingState = !playing;
-    console.log('Toggle play/pause:', { current: playing, new: newPlayingState, muted });
 
     if (newPlayingState) {
       // Trying to play
       if (!muted) {
         // If trying to play unmuted, mute first for autoplay compatibility
-        console.log('Attempting to play unmuted video, muting first');
         setMuted(true);
         setPlaying(true);
       } else {
@@ -78,7 +75,6 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     // Handle mute/unmute toggle
   const toggleMute = () => {
     const newMutedState = !muted;
-    console.log('Toggle mute:', { current: muted, new: newMutedState, playing });
 
     if (newMutedState) {
       // Muting - just change mute state
@@ -186,11 +182,9 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
         controls={false} // We're using custom controls
         onProgress={handleProgress}
         onPause={() => {
-          console.log('Video paused by browser');
           setPlaying(false);
         }}
         onPlay={() => {
-          console.log('Video playing by browser');
           setPlaying(true);
         }}
         onError={(error) => {

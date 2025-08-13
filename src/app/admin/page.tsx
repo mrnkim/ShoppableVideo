@@ -81,7 +81,6 @@ export default function AdminPage() {
 
     try {
       // Call analyze API with forceReanalyze=true
-      console.log('🔄 Reanalyzing video:', videoId);
       const analyzeResponse = await fetch(`/api/analyze?videoId=${videoId}&forceReanalyze=true`);
 
       if (!analyzeResponse.ok) {
@@ -90,7 +89,6 @@ export default function AdminPage() {
       }
 
       const analyzeData = await analyzeResponse.json();
-      console.log('📊 Reanalysis result:', analyzeData);
 
       // Store the analyze response for display
       setAnalyzeResponses(prev => ({
@@ -113,7 +111,6 @@ export default function AdminPage() {
           }
 
           products = JSON.parse(jsonString);
-          console.log('📦 Parsed products:', products);
 
           if (!Array.isArray(products)) {
             throw new Error('Parsed data is not an array');
@@ -124,7 +121,6 @@ export default function AdminPage() {
         }
 
         // Save the generated metadata
-        console.log('💾 Saving reanalyzed metadata to TwelveLabs...');
         const saveRequestBody = {
           videoId: videoId,
           indexId: defaultIndexId,
@@ -149,7 +145,6 @@ export default function AdminPage() {
         }
 
         const saveResult = await saveResponse.json();
-        console.log('✅ Reanalyzed metadata saved successfully:', saveResult);
 
         // Reload video details to show updated metadata
         await loadVideoDetails(videoId);
