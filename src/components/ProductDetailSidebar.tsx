@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { ShoppingBag, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import { ProductDetailSidebarProps } from '@/lib/types';
 
@@ -15,9 +15,10 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   const isUserScrollingRef = useRef<boolean>(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastActiveProductRef = useRef<string | null>(null);
 
-    // Handle user scroll detection
-  const handleScroll = () => {
+      // Handle user scroll detection
+  const handleScroll = useCallback(() => {
     isUserScrollingRef.current = true;
 
     // Clear previous timeout
@@ -29,7 +30,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
     scrollTimeoutRef.current = setTimeout(() => {
       isUserScrollingRef.current = false;
     }, 2000);
-  };
+  }, []);
 
   // Reset manual toggled state when products change
   useEffect(() => {
@@ -51,26 +52,44 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
         }
       };
     }
-  }, []);
+  }, [handleScroll]);
 
-  // Auto-scroll to active product when currentTime changes (only if user is not scrolling)
+    // Auto-scroll to active product when currentTime changes (only if user is not scrolling)
   useEffect(() => {
     if (products.length === 0 || isUserScrollingRef.current) return;
 
-    const activeProduct = products.find(product =>
+    // Find all active products at current time
+    const activeProducts = products.filter(product =>
       currentTime >= product.timeline[0] && currentTime <= product.timeline[1]
     );
 
-    if (activeProduct && sidebarRef.current) {
-      const uniqueKey = `${activeProduct.brand}-${activeProduct.product_name}-${activeProduct.timeline[0]}-${activeProduct.timeline[1]}`;
-      const productElement = productRefs.current[uniqueKey];
+    if (activeProducts.length === 0) {
+      lastActiveProductRef.current = null;
+      return;
+    }
 
-      if (productElement) {
-        productElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
-          inline: 'nearest'
-        });
+    // Sort by duration (shortest first) to prioritize products with shorter timeslots
+    const prioritizedProduct = activeProducts.reduce((shortest, current) => {
+      const shortestDuration = shortest.timeline[1] - shortest.timeline[0];
+      const currentDuration = current.timeline[1] - current.timeline[0];
+      return currentDuration < shortestDuration ? current : shortest;
+    });
+
+    if (prioritizedProduct && sidebarRef.current) {
+      const uniqueKey = `${prioritizedProduct.brand}-${prioritizedProduct.product_name}-${prioritizedProduct.timeline[0]}-${prioritizedProduct.timeline[1]}`;
+
+      // Only scroll if the active product has changed
+      if (lastActiveProductRef.current !== uniqueKey) {
+        lastActiveProductRef.current = uniqueKey;
+        const productElement = productRefs.current[uniqueKey];
+
+        if (productElement) {
+          productElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'nearest'
+          });
+        }
       }
     }
   }, [currentTime, products]);
