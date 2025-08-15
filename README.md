@@ -12,11 +12,14 @@ Built on **TwelveLabs’ Analyze API**, the app detects products that appear in 
 - **Dynamic Product Markers** – Visual indicators appear only when products are detected on screen
 - **Amazon Integration** – Direct links to Amazon search results for detected products
 
-## 🖼️ UI Walkthrough
+## 🛠️ How It Works
 
-1. **Product Markers** – Animated icons appear only when a product is on screen.
-2. **Context Sidebar** – When the product appears in the video, the product name and description are automatically displayed.
-3. **Checkout Flow** – Clicking the "Shop At Amazon" button takes you to the Amazon search results page for that product.
+![App screenshot](public/how.png)
+
+1. **Fetch Video** – Get the most recent video from the default Twelve Labs index.
+2. **Check Metadata** – If product metadata exists, display it. If not, proceed to analysis.
+3. **Analyze & Save** – Analyze the video with Twelve Labs to generate product info, then save it to the video.
+4. **Display Products** – Show the product details to the user in the UI.
 
 ## ⚙️ Built with
 
