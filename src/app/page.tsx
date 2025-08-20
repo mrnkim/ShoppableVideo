@@ -4,20 +4,15 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ProductVideoPlayer } from '@/components/ProductVideoPlayer';
 import ProductDetailSidebar from '@/components/ProductDetailSidebar';
 import { ProductInfo } from '@/lib/types';
-import { Info, ShoppingBag, ExpandMore } from '@mui/icons-material';
 import { VideoItem, VideoDetail } from '@/lib/types';
 
 
 export default function Home() {
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [products, setProducts] = useState<ProductInfo[]>([]);
-  const [visibleProducts, setVisibleProducts] = useState<ProductInfo[]>([]);
   const [collapsedProducts, setCollapsedProducts] = useState<Record<string, boolean>>({});
-  const [isLoadingProducts, setIsLoadingProducts] = useState<boolean>(false);
-  const [isLoadingRelated, setIsLoadingRelated] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [manualToggled, setManualToggled] = useState<Record<string, boolean | undefined>>({});
-  const [selectedProduct, setSelectedProduct] = useState<ProductInfo | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   // New state for video management
@@ -71,9 +66,7 @@ export default function Home() {
 
     // Clear previous video's product data when loading new video detail
     setProducts([]);
-    setVisibleProducts([]);
     setCollapsedProducts({});
-    setSelectedProduct(null);
     setManualToggled({});
     setCurrentTime(0);
     setIsAnalyzingVideo(true); // Start with analyzing state
@@ -235,9 +228,7 @@ export default function Home() {
 
     // Clear previous video's product data
     setProducts([]);
-    setVisibleProducts([]);
     setCollapsedProducts({});
-    setSelectedProduct(null);
     setManualToggled({});
     setCurrentTime(0);
 
@@ -262,14 +253,9 @@ export default function Home() {
   }, [products.length]);
 
 
-
   // Handle product selection
   const handleProductSelect = useCallback((product: ProductInfo) => {
-    setSelectedProduct(product);
-  }, []);
-
-  const handleVisibleProductsChange = useCallback((products: ProductInfo[]) => {
-    setVisibleProducts(products);
+    // Currently not used, but keeping for future functionality
   }, []);
 
   const handleToggleCollapse = (productName: string, brand: string, timeline: [number, number]) => {
@@ -319,8 +305,6 @@ export default function Home() {
       return changed ? newState : prev;
     });
   }, [manualToggled, products]);
-
-
 
   // Handle video player ready
   const handlePlayerReady = useCallback((player: { seekTo: (time: number) => void }) => {
@@ -436,7 +420,6 @@ export default function Home() {
                 videoUrl={videoUrl}
                 products={products}
                 onProductSelect={handleProductSelect}
-                onVisibleProductsChange={handleVisibleProductsChange}
                 onTimeUpdate={handleTimeUpdate}
                 autoPlay={true}
                 onPlayerReady={handlePlayerReady}

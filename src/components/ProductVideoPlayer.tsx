@@ -10,7 +10,6 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
   width = '100%',
   height = '100%',
   autoPlay = true,
-  onVisibleProductsChange,
   onTimeUpdate,
   onPlayerReady,
 }) => {
@@ -30,10 +29,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     setVisibleProducts([]);
     setPlaying(autoPlay);
     setMuted(true); // Always start muted for autoplay compatibility
-    if (onVisibleProductsChange) {
-      onVisibleProductsChange([]);
-    }
-  }, [videoUrl, autoPlay, onVisibleProductsChange]);
+  }, [videoUrl, autoPlay]);
 
   // Update current time and visible products
   const handleProgress = (state: { playedSeconds: number }) => {
@@ -158,11 +154,7 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
     playerRef.current.seekTo(seekTime);
   };
 
-  useEffect(() => {
-    if (onVisibleProductsChange) {
-      onVisibleProductsChange(visibleProducts);
-    }
-  }, [visibleProducts, onVisibleProductsChange]);
+
 
   return (
     <div

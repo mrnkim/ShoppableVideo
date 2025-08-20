@@ -74,7 +74,6 @@ export interface ProductVideoPlayerProps {
   width?: string | number;
   height?: string | number;
   autoPlay?: boolean;
-  onVisibleProductsChange?: (products: ProductInfo[]) => void;
   onTimeUpdate?: (currentTime: number) => void;
   onPlayerReady?: (player: { seekTo: (time: number) => void }) => void;
 }
