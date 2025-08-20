@@ -100,9 +100,8 @@ export default function Home() {
 
   // Check and generate metadata if needed
   const checkAndGenerateMetadata = useCallback(async (videoId: string, indexId: string, videoData: VideoDetail, forceReanalyze = false) => {
-    // Check if custom metadata already exists (unless forceReanalyze is true)
+    // 1) Use existing metadata if present (unless forceReanalyze)
     if (!forceReanalyze && videoData.user_metadata && Object.keys(videoData.user_metadata).length > 0) {
-      // Use existing metadata
       if (videoData.user_metadata.products) {
         let existingProducts;
         try {
@@ -131,10 +130,10 @@ export default function Home() {
       return;
     }
 
+    // 2) Otherwise, analyze now
     setIsAnalyzingVideo(true);
 
     try {
-      // Call analyze API to generate product information
       const analyzeResponse = await fetch(`/api/analyze?videoId=${videoId}${forceReanalyze ? '&forceReanalyze=true' : ''}`);
 
       if (!analyzeResponse.ok) {
@@ -147,20 +146,9 @@ export default function Home() {
 
       // Extract products from the analysis response
       if (analyzeData.data) {
-
-                // Parse the response data
         let products = [];
         try {
           let jsonString = analyzeData.data;
-
-          // Check if it's still wrapped in markdown code blocks (fallback)
-          if (jsonString.includes('```json')) {
-            jsonString = jsonString
-              .replace(/```json\n?/g, '')  // Remove opening ```json
-              .replace(/```\n?/g, '')      // Remove closing ```
-              .trim();                     // Remove extra whitespace
-          }
-
 
           products = JSON.parse(jsonString);
 
@@ -280,7 +268,6 @@ export default function Home() {
       currentProducts.forEach((p) => {
         const uniqueKey = `${p.brand}-${p.product_name}-${p.timeline[0]}-${p.timeline[1]}`;
         if (time >= p.timeline[0] && time <= p.timeline[1]) {
-          // 구간 내 진입 시 수동 토글 초기화하고 자동 펼침
           if (manualToggled[uniqueKey]) {
             setManualToggled((prevManual) => ({
               ...prevManual,
@@ -293,7 +280,6 @@ export default function Home() {
           }
         } else if (time > p.timeline[1]) {
           if (manualToggled[uniqueKey]) {
-            // 수동 토글이 있으면 자동 동작 무시
             return;
           }
           if (prev[uniqueKey] !== true) {
