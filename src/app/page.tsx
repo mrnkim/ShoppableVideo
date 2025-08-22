@@ -57,7 +57,7 @@ export default function Home() {
 
   // Load video detail when a video is selected
   const loadVideoDetail = useCallback(async (videoId: string) => {
-    const defaultIndexId = '688020fe934487793c56c6a7'; // From your .env file
+    const defaultIndexId = process.env.NEXT_PUBLIC_DEFAULT_INDEX_ID;
     if (!defaultIndexId || !videoId) {
       return;
     }
