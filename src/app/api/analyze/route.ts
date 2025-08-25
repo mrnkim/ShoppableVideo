@@ -13,19 +13,16 @@ export async function GET(req: Request) {
     const prompt = `
     List all the products shown in the video with the following details:
 
-- **timeline** – Timestamp when the product appears, in the format [start_time, end_time] (in seconds).
-- **brand** – Name of the brand.
-- **product_name** – Full name of the product.
-- **location** – Provide product locations as percentages based on 1920×1080 video frame in the format [x%, y%, width%, height%]:
-    - **x%, y%**: Top-left corner coordinates as percentages (0% = top-left of video)
-    - **width%, height%**: Product bounding box dimensions as percentages
-
-- **price** – The price of the product shown or mentioned, if available. If you cannot find price information directly from the video, use external search or your knowledge
-- **description** – Summarize what is said or implied about the product in the video (e.g., via voiceover, subtitles, or customer testimonials).
+- timeline: [start_time, end_time] in seconds
+- brand: brand name
+- product_name: full product name
+- location: [x%, y%, width%, height%] — percentage values relative to a 16:9 aspect ratio video player
+- price: price if shown or mentioned. If you cannot find price information directly from the video, use external search or your knowledge
+- description: describe what is said or shown about the product
 
 ⚠️ If multiple products appear in the same scene, list them separately with their own location coordinates.
 
-**Respond with a valid JSON array only, no markdown formatting:**
+Respond with a valid JSON array only, no markdown formatting:
 
 [
   {
