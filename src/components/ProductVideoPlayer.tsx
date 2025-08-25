@@ -203,22 +203,23 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
           return (
             <button
               key={product.product_name}
-              className="product-marker absolute rounded-full bg-black bg-opacity-70 flex items-center justify-center cursor-pointer pointer-events-auto animate-pulse-slow transition-transform duration-300 ease-in-out hover:scale-110"
+              className="product-marker absolute rounded-full bg-black bg-opacity-70 flex items-center justify-center cursor-pointer pointer-events-auto animate-pulse-slow transition-all duration-300 ease-in-out z-10"
               style={{
                 left: position.left,
                 top: position.top,
-                width: '40px', // Fixed width for the marker
-                height: '40px', // Fixed height for the marker
+                width: '48px', // Increased width for better clickability
+                height: '48px', // Increased height for better clickability
                 transform: 'translate(-50%, -50%)'
               }}
               onClick={(e) => {
                 e.stopPropagation();
+                console.log('Product marker clicked:', product.product_name);
                 onProductSelect(product);
                 setPlaying(false);
               }}
               aria-label={`View ${product.product_name} details`}
             >
-              <ShoppingBag className="text-white" style={{ fontSize: '20px' }} />
+              <ShoppingBag className="text-white" style={{ fontSize: '24px' }} />
             </button>
           );
         })}

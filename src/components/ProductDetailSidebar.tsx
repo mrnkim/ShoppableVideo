@@ -10,6 +10,7 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
   isLoading = false,
   currentTime = 0,
   onProductClick,
+  highlightedProduct,
 }) => {
   const productRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const sidebarRef = useRef<HTMLDivElement | null>(null);
@@ -93,6 +94,25 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
       }
     }
   }, [currentTime, products]);
+
+  // Auto-scroll to highlighted product when it changes
+  useEffect(() => {
+    if (highlightedProduct && sidebarRef.current) {
+      const uniqueKey = `${highlightedProduct.brand}-${highlightedProduct.product_name}-${highlightedProduct.timeline[0]}-${highlightedProduct.timeline[1]}`;
+      const productElement = productRefs.current[uniqueKey];
+
+      if (productElement) {
+        // Reset user scrolling flag to allow auto-scroll
+        isUserScrollingRef.current = false;
+
+        productElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'nearest'
+        });
+      }
+    }
+  }, [highlightedProduct]);
   if (!products.length && !isLoading) {
     return (
       <div className="bg-white rounded-[45.06px] p-6 mb-6 text-center h-full">
@@ -132,6 +152,11 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
         const isActive = currentTime >= product.timeline[0] && currentTime <= product.timeline[1];
         const isManuallyToggled = manualToggled[uniqueKey];
         const shouldEnableShopButton = isActive;
+        const isHighlighted = highlightedProduct &&
+          highlightedProduct.brand === product.brand &&
+          highlightedProduct.product_name === product.product_name &&
+          highlightedProduct.timeline[0] === product.timeline[0] &&
+          highlightedProduct.timeline[1] === product.timeline[1];
 
         const textColor = isActive ? 'text-black' : 'text-gray-400';
         const titleColor = isActive ? 'text-black' : 'text-gray-500';
@@ -139,7 +164,11 @@ const ProductDetailSidebar: React.FC<ProductDetailSidebarProps> = React.memo(({
         return (
           <div
             key={reactKey}
-            className="mb-6"
+            className={`mb-6 transition-all duration-300 ${
+              isHighlighted
+                ? 'bg-gray-100 border-2 border-black rounded-lg p-4 shadow-md'
+                : ''
+            }`}
             ref={(el) => {
               productRefs.current[uniqueKey] = el;
             }}

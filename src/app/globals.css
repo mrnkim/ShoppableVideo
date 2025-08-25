@@ -67,11 +67,14 @@ body {
 
 .product-marker {
   animation: fadeIn 0.3s ease-in-out;
+  cursor: pointer !important;
+  z-index: 10;
 }
 
 .product-marker:hover {
-  transform: scale(1.1);
+  transform: translate(-50%, -50%) scale(1.1) !important;
   transition: transform 0.2s ease;
+  background-color: rgba(0, 0, 0, 0.9) !important;
 }
 
 /* Video player custom styles */

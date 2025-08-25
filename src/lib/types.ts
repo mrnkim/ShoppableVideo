@@ -65,6 +65,7 @@ export interface ProductDetailSidebarProps {
   isLoading?: boolean;
   currentTime?: number;
   onProductClick?: (product: ProductInfo) => void;
+  highlightedProduct?: ProductInfo | null;
 }
 
 export interface ProductVideoPlayerProps {

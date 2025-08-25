@@ -14,6 +14,7 @@ export default function Home() {
   const [currentTime, setCurrentTime] = useState(0);
   const [manualToggled, setManualToggled] = useState<Record<string, boolean | undefined>>({});
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [highlightedProduct, setHighlightedProduct] = useState<ProductInfo | null>(null);
 
   // New state for video management
   const [videos, setVideos] = useState<VideoItem[]>([]);
@@ -69,6 +70,7 @@ export default function Home() {
     setCollapsedProducts({});
     setManualToggled({});
     setCurrentTime(0);
+    setHighlightedProduct(null);
     setIsAnalyzingVideo(true); // Start with analyzing state
     try {
       const response = await fetch(`/api/videos/${videoId}?indexId=${defaultIndexId}`);
@@ -243,7 +245,12 @@ export default function Home() {
 
   // Handle product selection
   const handleProductSelect = useCallback((product: ProductInfo) => {
-    // Currently not used, but keeping for future functionality
+    setHighlightedProduct(product);
+
+    // Auto-clear highlight after 3 seconds
+    setTimeout(() => {
+      setHighlightedProduct(null);
+    }, 3000);
   }, []);
 
   const handleToggleCollapse = (productName: string, brand: string, timeline: [number, number]) => {
@@ -434,6 +441,7 @@ export default function Home() {
               isLoading={isAnalyzingVideo}
               currentTime={currentTime}
               onProductClick={handleProductClick}
+              highlightedProduct={highlightedProduct}
             />
           </div>
         </div>
