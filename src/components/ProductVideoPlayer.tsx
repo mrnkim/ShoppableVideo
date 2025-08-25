@@ -215,7 +215,6 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
                 e.stopPropagation();
                 console.log('Product marker clicked:', product.product_name);
                 onProductSelect(product);
-                setPlaying(false);
               }}
               aria-label={`View ${product.product_name} details`}
             >
