@@ -207,8 +207,8 @@ const ProductVideoPlayer: React.FC<ProductVideoPlayerProps> = ({
               style={{
                 left: position.left,
                 top: position.top,
-                width: '48px', // Increased width for better clickability
-                height: '48px', // Increased height for better clickability
+                width: '48px',
+                height: '48px', 
                 transform: 'translate(-50%, -50%)'
               }}
               onClick={(e) => {

@@ -7,11 +7,11 @@ const TWELVELABS_API_BASE_URL = process.env.TWELVELABS_API_BASE_URL;
 interface VideoApiResponse {
   _id: string;
   index_id?: string;
-  hls?: Record<string, unknown>; // Or a more specific HLS type if available
-  system_metadata?: Record<string, unknown>; // Renamed from metadata to system_metadata
-  user_metadata?: Record<string, unknown>; // Added for user metadata
-  source?: Record<string, unknown>; // Or a more specific Source type
-  embedding?: Record<string, unknown>; // Or a more specific Embedding type
+  hls?: Record<string, unknown>;
+  system_metadata?: Record<string, unknown>;
+  user_metadata?: Record<string, unknown>;
+  source?: Record<string, unknown>;
+  embedding?: Record<string, unknown>;
 }
 
 // Define types for TwelveLabs API response

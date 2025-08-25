@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 const API_KEY = process.env.TWELVELABS_API_KEY;
 const TWELVELABS_API_BASE_URL = process.env.TWELVELABS_API_BASE_URL;
 
-// Twelve Labs API 응답 타입 정의
 type TwelveLabsVideoItem = {
   _id: string;
   created_at: string;
@@ -83,7 +82,6 @@ export async function GET(request: NextRequest) {
 
     const data = await response.json() as TwelveLabsApiResponse;
 
-    // API 응답 그대로 반환 (이미 TwelveLabsApiResponse 타입에 맞게 수정함)
     const formattedData = {
       data: data.data,
       page_info: {
